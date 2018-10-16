@@ -109,6 +109,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public void onClick(View view) {
                 attemptLogin();
+                Snackbar.make(view, "Login Unsuccessful. Try Again", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
 
@@ -207,6 +209,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
+        if(mPasswordView.getText().length() == 0){
+            mPasswordView.setError(getString(R.string.error_field_required));
+            cancel = true;
+        }
 //        if (cancel) {
 //            // There was an error; don't attempt login and focus the first
 //            // form field with an error.
@@ -232,18 +238,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         }
         if(response.equals("success")){
-            goToMainActivity();
             sp.edit().putBoolean("logged", true).apply();
+            goToMainActivity();
         }
     }
 
     private String sendJson(String email, String password){
-        String url = "https://sosial.azurewebsites.net/test";
+        String url = "https://sosial.azurewebsites.net/login";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
-            postData.put("message", email);
-//            postData.put("pass", password);
+            postData.put("username", email);
+            postData.put("password", password);
             SendRequest sdd =  new SendRequest();
             response  = sdd.execute(url, postData.toString()).get();
         }
