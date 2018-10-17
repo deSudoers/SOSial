@@ -98,8 +98,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
         sp = getSharedPreferences("login", MODE_PRIVATE);
+        sp.getString("token", "");
 
         if(sp.getBoolean("logged",  false)){
+            sp.edit().putBoolean("logged", false).apply();
             goToMainActivity();
         }
 
@@ -191,21 +193,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
+//        // Check for a valid password, if the user entered one.
+//        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+//            mPasswordView.setError(getString(R.string.error_invalid_password));
+//            focusView = mPasswordView;
+//            cancel = true;
+//        }
+//
+//        // Check for a valid email address.
+//        if (TextUtils.isEmpty(email)) {
+//            mEmailView.setError(getString(R.string.error_field_required));
+//            focusView = mEmailView;
+//            cancel = true;
+//        } else if (!isEmailValid(email)) {
+//            mEmailView.setError(getString(R.string.error_invalid_email));
+//            focusView = mEmailView;
+//            cancel = true;
+//        }
+        if(mEmailView.getText().length() == 0){
+            mEmailView.setError("This field is required");
             cancel = true;
         }
 
@@ -229,7 +235,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         JSONObject json = null;
         try {
             json = new JSONObject(response);
-            response = json.getString("response");
+            response = json.getString("message");
         }
         catch (JSONException e){
             e.printStackTrace();
@@ -237,18 +243,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         catch (Exception e){
 
         }
-        if(response.equals("success")){
+        if(response.equals("Login Successful.")){
             sp.edit().putBoolean("logged", true).apply();
             goToMainActivity();
         }
     }
 
-    private String sendJson(String email, String password){
-        String url = "https://sosial.azurewebsites.net/login";
+    private String sendJson(String user, String password){
+        String url = "http://192.168.43.168:5000/login";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
-            postData.put("username", email);
+            postData.put("username", user);
             postData.put("password", password);
             SendRequest sdd =  new SendRequest();
             response  = sdd.execute(url, postData.toString()).get();
@@ -282,11 +288,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 wr.writeBytes(params[1]);
                 wr.flush();
                 wr.close();
+                String cookie = httpURLConnection.getHeaderField("Set-Cookie");
+                sp.edit().putString("token", cookie).apply();
 
-                String line;
-                BufferedReader br=new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-                while ((line=br.readLine()) != null) {
-                    data+=line;
+                int response = httpURLConnection.getResponseCode();
+                if(response == HttpURLConnection.HTTP_OK){
+                    data = "Login Successful.";
+                }
+                else{
+                    data = "Login Unsuccessful.";
                 }
 
             } catch (Exception e) {
@@ -307,46 +317,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
         }
     }
-
-    class GetResponse extends AsyncTask<String, Void, String>{
-        @Override
-        protected String doInBackground(String... params) {
-
-            String data = "";
-
-            HttpURLConnection httpURLConnection = null;
-            try {
-                httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.setDoInput(true);
-                InputStream in = httpURLConnection.getInputStream();
-                InputStreamReader inputStreamReader = new InputStreamReader(in);
-
-                int inputStreamData = inputStreamReader.read();
-                while (inputStreamData != -1) {
-                    char current = (char) inputStreamData;
-                    inputStreamData = inputStreamReader.read();
-                    data += current;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            finally {
-                if (httpURLConnection != null) {
-                    httpURLConnection.disconnect();
-                }
-            }
-
-            return data;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
-        }
-    }
-
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic

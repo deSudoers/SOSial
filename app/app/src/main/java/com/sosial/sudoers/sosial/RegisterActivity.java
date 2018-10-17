@@ -38,6 +38,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -100,11 +101,16 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         });
 
         Button mEmailSignInButton = (Button) findViewById(R.id.register_button);
+
+        sp = getSharedPreferences("login", MODE_PRIVATE);
+        sp.getString("token", "");
+        sp.getString("register_error", "An Error Occurred. Please Try Again.");
+
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
-                Snackbar.make(view, "Username Already Exists", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, sp.getString("register_error", "An Error Occurred. Please Try Again."), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -239,9 +245,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             cancel = true;
         }
 
-        if(cancel)
-            return;
-
 //        if (cancel) {
 //            // There was an error; don't attempt login and focus the first
 //            // form field with an error.
@@ -258,7 +261,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         JSONObject json = null;
         try {
             json = new JSONObject(response);
-            response = json.getString("response");
+            response = json.getString("message");
         }
         catch (JSONException e){
             e.printStackTrace();
@@ -266,9 +269,13 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         catch (Exception e){
 
         }
-        if(response.equals("success")){
-            goToMainActivity();
+
+        if(response.equals("Login Successful.")){
             sp.edit().putBoolean("logged", true).apply();
+            goToMainActivity();
+        }
+        else{
+            sp.edit().putString("register_error", response).apply();
         }
     }
 
@@ -279,7 +286,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
 
     private String sendJson(String... params){
-        String url = "https://sosial.azurewebsites.net/register";
+        String url = "http://192.168.43.168:5000/register";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
@@ -320,11 +327,18 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 wr.writeBytes(params[1]);
                 wr.flush();
                 wr.close();
+                String cookie = httpURLConnection.getHeaderField("Set-Cookie");
+                sp.edit().putString("token", cookie).apply();
 
-                String line;
-                BufferedReader br=new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-                while ((line=br.readLine()) != null) {
-                    data+=line;
+                int response = httpURLConnection.getResponseCode();
+                if(response == HttpURLConnection.HTTP_OK){
+                    data = "Login Successful.";
+                }
+                else if(response == HttpURLConnection.HTTP_BAD_REQUEST){
+                    data = "Username Already Exists.";
+                }
+                else {
+                    data = "An Error Occurred. Please Try Again.";
                 }
 
             } catch (Exception e) {
