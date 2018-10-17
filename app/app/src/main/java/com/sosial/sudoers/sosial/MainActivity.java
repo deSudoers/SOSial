@@ -18,6 +18,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -27,6 +30,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private TextView mProfileInfo;
+    private TextView mName;
+    private TextView mEmail;
 
     private SharedPreferences sp;
     @Override
@@ -60,14 +65,37 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        View headerView = navigationView.getHeaderView(0);
+
+        mName = (TextView) headerView.findViewById(R.id.name_id);
+        mEmail = (TextView) headerView.findViewById(R.id.textView);
+
         String url = "http://192.168.43.168:5000/profile";
         GetProfile gp = new GetProfile();
         try {
-            mProfileInfo.setText(gp.execute(url).get());
+            updateProfile(gp.execute(url).get());
         }
         catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void updateProfile(String profile){
+        String name = "";
+        String email = "";
+        JSONObject json = null;
+        try{
+            json = new JSONObject(profile);
+            name = json.getString("first_name") +" ";
+            name += json.getString("last_name");
+            mName.setText(name);
+            email = json.getString("email");
+            mEmail.setText(email);
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+        mProfileInfo.setText(profile);
     }
 
     class GetProfile extends AsyncTask<String, Void, String> {
@@ -150,6 +178,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
+            goToMemberActivity();
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
 
@@ -172,6 +201,11 @@ public class MainActivity extends AppCompatActivity
         sp.edit().putBoolean("logged", false);
         sp.edit().putString("token", "");
         Intent i = new Intent(this, LoginActivity.class);
+        startActivity(i);
+    }
+
+    public void goToMemberActivity(){
+        Intent i = new Intent(this, MemberActivity.class);
         startActivity(i);
     }
 }
