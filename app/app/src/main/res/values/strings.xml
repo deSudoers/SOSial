@@ -25,4 +25,7 @@
     <string name="last_name">Last Name</string>
     <string name="mobile_no">Mobile Number</string>
     <string name="username">User Name</string>
+    <string name="title_activity_member">Members</string>
+    <string name="add_member">Add Member</string>
+    <string name="remove_member">Remove Member</string>
 </resources>

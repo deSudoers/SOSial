@@ -245,38 +245,39 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             cancel = true;
         }
 
-//        if (cancel) {
-//            // There was an error; don't attempt login and focus the first
-//            // form field with an error.
-//            focusView.requestFocus();
-//        } else {
-//            // Show a progress spinner, and kick off a background task to
-//            // perform the user login attempt.
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+            sp.edit().putString("register_error", "An Error Occurred. Please Try Again").apply();
+        } else {
+            // Show a progress spinner, and kick off a background task to
+            // perform the user login attempt.
 //            showProgress(true);
 //            mAuthTask = new UserLoginTask(email, password);
 //            mAuthTask.execute((Void) null);
-//        }
+            String response = sendJson(username, password, email, mobile, firstname, lastname);
+            JSONObject json = null;
+            try {
+                json = new JSONObject(response);
+                response = json.getString("message");
+            }
+            catch (JSONException e){
+                e.printStackTrace();
+            }
+            catch (Exception e){
 
-        String response = sendJson(username, password, email, mobile, firstname, lastname);
-        JSONObject json = null;
-        try {
-            json = new JSONObject(response);
-            response = json.getString("message");
-        }
-        catch (JSONException e){
-            e.printStackTrace();
-        }
-        catch (Exception e){
+            }
 
+            if(response.equals("Login Successful.")){
+                sp.edit().putBoolean("logged", true).apply();
+                goToMainActivity();
+            }
+            else {
+                sp.edit().putString("register_error", response).apply();
+            }
         }
 
-        if(response.equals("Login Successful.")){
-            sp.edit().putBoolean("logged", true).apply();
-            goToMainActivity();
-        }
-        else{
-            sp.edit().putString("register_error", response).apply();
-        }
     }
 
     public void goToMainActivity(){
@@ -329,6 +330,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 wr.close();
                 String cookie = httpURLConnection.getHeaderField("Set-Cookie");
                 sp.edit().putString("token", cookie).apply();
+                Log.e("cook", sp.getString("token",""));
 
                 int response = httpURLConnection.getResponseCode();
                 if(response == HttpURLConnection.HTTP_OK){

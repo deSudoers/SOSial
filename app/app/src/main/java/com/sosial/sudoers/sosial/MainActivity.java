@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToLoginActivity();
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -86,11 +85,13 @@ public class MainActivity extends AppCompatActivity
         JSONObject json = null;
         try{
             json = new JSONObject(profile);
-            name = json.getString("first_name") +" ";
-            name += json.getString("last_name");
+            name = json.getString("name");
             mName.setText(name);
             email = json.getString("email");
             mEmail.setText(email);
+            sp.edit().putString("email", json.getString("family_email")).apply();
+            sp.edit().putString("name", json.getString("family_name")).apply();
+            sp.edit().putString("userid", json.getString("family_id")).apply();
         }
         catch (JSONException e){
             e.printStackTrace();
@@ -189,7 +190,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
-
+            goToLoginActivity();
+            sp.edit().putBoolean("logged", false).apply();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
