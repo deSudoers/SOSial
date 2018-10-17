@@ -78,12 +78,22 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e){
             e.printStackTrace();
         }
+
         Button openTrigger = (Button) findViewById(R.id.opentrigger);
         openTrigger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent j = new Intent(MainActivity.this, TriggerActivity.class);
-                startActivity(j);
+                Intent t = new Intent(MainActivity.this, TriggerActivity.class);
+                startActivity(t);
+            }
+        });
+
+        Button openMessaging = (Button) findViewById(R.id.openmsg);
+        openMessaging.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent m = new Intent(MainActivity.this, MessagingActivity.class);
+                startActivity(m);
             }
         });
     }

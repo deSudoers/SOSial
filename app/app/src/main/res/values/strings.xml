@@ -30,4 +30,8 @@
     <string name="remove_member">Remove Member</string>
     <string name="trigger">Trigger</string>
     <string name="open_trigger">Open Trigger</string>
+    <string name="messaging">Messaging</string>
+    <string name="enter_message">Enter Message</string>
+    <string name="to">To</string>
+    <string name="send">send</string>
 </resources>
