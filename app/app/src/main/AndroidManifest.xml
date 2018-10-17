@@ -38,6 +38,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sosial.sudoers.sosial.LoginActivity" />
         </activity>
+        <activity android:name=".TriggerActivity"/>
     </application>
 
 </manifest>

@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.InputStream;
@@ -68,6 +69,14 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e){
             e.printStackTrace();
         }
+        Button openTrigger = (Button) findViewById(R.id.opentrigger);
+        openTrigger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent j = new Intent(MainActivity.this, TriggerActivity.class);
+                startActivity(j);
+            }
+        });
     }
 
     class GetProfile extends AsyncTask<String, Void, String> {
