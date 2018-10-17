@@ -46,6 +46,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sosial.sudoers.sosial.MainActivity" />
         </activity>
+        <activity android:name=".TriggerActivity"/>
     </application>
 
 </manifest>

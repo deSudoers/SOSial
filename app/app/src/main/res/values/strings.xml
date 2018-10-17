@@ -28,4 +28,6 @@
     <string name="title_activity_member">Members</string>
     <string name="add_member">Add Member</string>
     <string name="remove_member">Remove Member</string>
+    <string name="trigger">Trigger</string>
+    <string name="open_trigger">Open Trigger</string>
 </resources>
