@@ -287,7 +287,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
 
     private String sendJson(String... params){
-        String url = "http://192.168.43.66:5000/register";
+        String url = "http://192.168.43.168:5000/register";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
