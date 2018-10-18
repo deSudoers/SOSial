@@ -281,7 +281,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private String sendJson(String user, String password){
-        String url = "http://192.168.43.168:5000/login";
+        String url = "http://192.168.43.66:5000/login";
         String response = "";
         JSONObject postData = new JSONObject();
         try{

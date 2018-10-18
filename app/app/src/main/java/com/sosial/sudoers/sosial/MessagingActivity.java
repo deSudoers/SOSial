@@ -135,7 +135,7 @@ public class MessagingActivity extends AppCompatActivity {
     }
 
     private String sendJson(String id, String msg){
-        String url = "http://192.168.43.168:5000/message";
+        String url = "http://192.168.43.66:5000/message";
         String response = "";
         JSONObject postData = new JSONObject();
         try{

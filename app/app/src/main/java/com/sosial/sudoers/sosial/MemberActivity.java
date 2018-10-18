@@ -259,7 +259,7 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
     }
 
     private String sendJson(String email){
-        String url = "http://192.168.43.168:5000/family";
+        String url = "http://192.168.43.66:5000/family";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
@@ -370,7 +370,7 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
     }
 
     private String sendJson2(String id){
-        String url = "http://192.168.43.168:5000/family";
+        String url = "http://192.168.43.66:5000/family";
         String response = "";
         JSONObject postData = new JSONObject();
         try{

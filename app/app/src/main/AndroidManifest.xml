@@ -81,6 +81,15 @@
                 <action android:name=".RestartSensor" />
             </intent-filter>
         </receiver>
+        <activity
+            android:name=".ViewMessageActivity"
+            android:label="@string/title_activity_view_message"
+            android:parentActivityName=".Inbox"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sosial.sudoers.sosial.Inbox" />
+        </activity>
     </application>
 
 </manifest>
