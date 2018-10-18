@@ -66,6 +66,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sosial.sudoers.sosial.MainActivity" />
         </activity>
+
+        <service
+            android:name=".TriggerChecker"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name=".TriggerCheckerBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:label="RestartServiceWhenStopped">
+            <intent-filter>
+                <action android:name=".RestartSensor" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

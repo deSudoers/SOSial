@@ -1,5 +1,6 @@
 package com.sosial.sudoers.sosial;
 
+import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity
         mName = (TextView) headerView.findViewById(R.id.name_id);
         mEmail = (TextView) headerView.findViewById(R.id.textView);
 
-        String url = "http://192.168.43.66:5000/profile";
+        String url = "http://192.168.43.168:5000/profile";
         GetProfile gp = new GetProfile();
         try {
             updateProfile(gp.execute(url).get());

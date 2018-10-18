@@ -3,6 +3,8 @@ package com.sosial.sudoers.sosial;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -75,11 +77,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
 
     private SharedPreferences sp;
+    Intent mServiceIntent;
+    private TriggerChecker mTriggerChecker;
+    Context ctx;
+    public Context getCtx(){
+        return ctx;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ctx = this;
         setContentView(R.layout.activity_login);
+
+        mTriggerChecker = new TriggerChecker(getCtx());
+        mServiceIntent = new Intent(getCtx(), mTriggerChecker.getClass());
+        if (!isMyServiceRunning(mTriggerChecker.getClass())) {
+            startService(mServiceIntent);
+        }
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -126,6 +141,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 goToRegisterActivity();
             }
         });
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("isMyServiceRunning?", true+"");
+                return true;
+            }
+        }
+        Log.i ("isMyServiceRunning?", false+"");
+        return false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(mServiceIntent);
+        Log.i("MAINACT", "onDestroy!");
+        super.onDestroy();
+
     }
 
     private void populateAutoComplete() {
@@ -219,11 +254,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mPasswordView.setError(getString(R.string.error_field_required));
             cancel = true;
         }
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
-        } else {
+
+        if(!cancel){
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             //showProgress(true);
@@ -249,7 +281,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private String sendJson(String user, String password){
-        String url = "http://192.168.43.66:5000/login";
+        String url = "http://192.168.43.168:5000/login";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
