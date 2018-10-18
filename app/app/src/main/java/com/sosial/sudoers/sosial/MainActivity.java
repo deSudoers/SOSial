@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         mName = (TextView) headerView.findViewById(R.id.name_id);
         mEmail = (TextView) headerView.findViewById(R.id.textView);
 
-        String url = "http://192.168.43.168:5000/profile";
+        String url = "http://192.168.43.66:5000/profile";
         GetProfile gp = new GetProfile();
         try {
             updateProfile(gp.execute(url).get());
@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity
             goToMemberActivity();
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
+            goToInbox();
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -221,6 +222,11 @@ public class MainActivity extends AppCompatActivity
 
     public void goToMemberActivity(){
         Intent i = new Intent(this, MemberActivity.class);
+        startActivity(i);
+    }
+
+    public void goToInbox(){
+        Intent i = new Intent(this, Inbox.class);
         startActivity(i);
     }
 }

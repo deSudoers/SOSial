@@ -36,4 +36,7 @@
     <string name="send">send</string>
     <string name="title_activity_messaging">Message</string>
     <string name="action_send">Send</string>
+    <string name="inbox">Inbox</string>
+    <string name="title_activity_inbox">Inbox</string>
+
 </resources>

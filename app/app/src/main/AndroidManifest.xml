@@ -57,6 +57,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sosial.sudoers.sosial.MainActivity" />
         </activity>
+        <activity
+            android:name=".Inbox"
+            android:label="@string/title_activity_inbox"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sosial.sudoers.sosial.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
