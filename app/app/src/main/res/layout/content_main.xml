@@ -22,22 +22,12 @@
         android:id="@+id/opentrigger"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:text="@string/open_trigger"
         app:layout_constraintBottom_toTopOf="@+id/profile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/openmsg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/messaging"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile" />
 
 </android.support.constraint.ConstraintLayout>

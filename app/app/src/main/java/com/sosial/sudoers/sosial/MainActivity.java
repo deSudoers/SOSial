@@ -46,8 +46,10 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+                Intent m = new Intent(MainActivity.this, MessagingActivity.class);
+                startActivity(m);
             }
         });
 
@@ -87,15 +89,6 @@ public class MainActivity extends AppCompatActivity
                 startActivity(t);
             }
         });
-
-        Button openMessaging = (Button) findViewById(R.id.openmsg);
-        openMessaging.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent m = new Intent(MainActivity.this, MessagingActivity.class);
-                startActivity(m);
-            }
-        });
     }
 
     public void updateProfile(String profile){
@@ -108,6 +101,7 @@ public class MainActivity extends AppCompatActivity
             mName.setText(name);
             email = json.getString("email");
             mEmail.setText(email);
+            sp.edit().putString("myid", json.getString("user_id")).apply();
             sp.edit().putString("email", json.getString("family_email")).apply();
             sp.edit().putString("name", json.getString("family_name")).apply();
             sp.edit().putString("userid", json.getString("family_id")).apply();

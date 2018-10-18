@@ -47,11 +47,16 @@
                 android:value="com.sosial.sudoers.sosial.MainActivity" />
         </activity>
         <activity
-            android:label="Message"
-            android:name=".MessagingActivity"/>
+            android:name=".TriggerActivity"
+            android:label="@string/trigger" />
         <activity
-            android:label="@string/trigger"
-            android:name=".TriggerActivity"/>
+            android:name=".MessagingActivity"
+            android:label="@string/title_activity_messaging"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sosial.sudoers.sosial.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -29,9 +29,11 @@
     <string name="add_member">Add Member</string>
     <string name="remove_member">Remove Member</string>
     <string name="trigger">Trigger</string>
-    <string name="open_trigger">Open Trigger</string>
+    <string name="open_trigger">SOS</string>
     <string name="messaging">Messaging</string>
     <string name="enter_message">Enter Message</string>
     <string name="to">To</string>
     <string name="send">send</string>
+    <string name="title_activity_messaging">Message</string>
+    <string name="action_send">Send</string>
 </resources>
