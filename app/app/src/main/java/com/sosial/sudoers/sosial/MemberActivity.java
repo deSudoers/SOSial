@@ -216,6 +216,7 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
+            sp.edit().putString("member_error", "An Error Occurred. Please Try Again.").apply();
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
@@ -238,7 +239,8 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
                 e.printStackTrace();
             }
 
-            if(!response.equals("User Not Found.") && !response.equals("An Error Occurred. Please Try Again.") && !response.equals("User Cannot be Family Member")){
+            if(!response.equals("User Not Found.") && !response.equals("An Error Occurred. Please Try Again.")
+                    && !response.equals("User Cannot be Family Member.") && !response.equals("User Already in Family.")){
                 String old = sp.getString("userid", "");
                 old += rid+",";
                 sp.edit().putString("userid", old).apply();
@@ -311,7 +313,7 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
                     data = "User Not Found.";
                 }
                 else if(response == httpURLConnection.HTTP_NOT_ACCEPTABLE){
-                    data = "User Cannot be Family Member";
+                    data = "User Cannot be Family Member.";
                 }
                 else{
                     data = "An Error Occurred. Please Try Again.";
@@ -340,29 +342,30 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
         int selected = mSpinnerlist.getSelectedItemPosition();
 
         String id = sp.getString("userid", "").split(",")[selected];
-        String response = sendJson2(id);
+        if(id != "") {
+            String response = sendJson2(id);
 
-        if(!response.equals("An Error Occurred. Please Try Again.")){
-            String old[] = sp.getString("userid", "").split(",");
-            String old2[] = sp.getString("name", "").split(",");
-            String old3[] = sp.getString("email", "").split(",");
-            String newuser = "", newname="", newemail="";
+            if (!response.equals("An Error Occurred. Please Try Again.")) {
+                String old[] = sp.getString("userid", "").split(",");
+                String old2[] = sp.getString("name", "").split(",");
+                String old3[] = sp.getString("email", "").split(",");
+                String newuser = "", newname = "", newemail = "";
 
-            for(int i = 0; i < old.length; ++i){
-                if(i != selected){
-                    newuser += old[i]+",";
-                    newname += old2[i]+",";
-                    newemail += old3[i]+",";
+                for (int i = 0; i < old.length; ++i) {
+                    if (i != selected) {
+                        newuser += old[i] + ",";
+                        newname += old2[i] + ",";
+                        newemail += old3[i] + ",";
+                    }
                 }
-            }
 
-            sp.edit().putString("userid", newuser).apply();
-            sp.edit().putString("name", newname).apply();
-            sp.edit().putString("email", newemail).apply();
-            sp.edit().putString("member_error", "Deleted Successfully").apply();
-        }
-        else{
-            sp.edit().putString("member_error", response).apply();
+                sp.edit().putString("userid", newuser).apply();
+                sp.edit().putString("name", newname).apply();
+                sp.edit().putString("email", newemail).apply();
+                sp.edit().putString("member_error", "Deleted Successfully").apply();
+            } else {
+                sp.edit().putString("member_error", response).apply();
+            }
         }
     }
 
@@ -402,16 +405,15 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
                 httpURLConnection.setDoInput(true);
                 DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
                 wr.writeBytes(params[1]);
+                Log.e("member2", params[1]);
                 wr.flush();
                 wr.close();
-                InputStream in = httpURLConnection.getInputStream();
-                InputStreamReader inputStreamReader = new InputStreamReader(in);
-
-                int inputStreamData = inputStreamReader.read();
-                while (inputStreamData != -1) {
-                    char current = (char) inputStreamData;
-                    inputStreamData = inputStreamReader.read();
-                    data += current;
+                int response = httpURLConnection.getResponseCode();
+                if(response == httpURLConnection.HTTP_OK){
+                    data = "Deleted Successfully.";
+                }
+                else{
+                    data = "An Error Occurred. Please Try Again.";
                 }
             } catch (Exception e) {
                 e.printStackTrace();

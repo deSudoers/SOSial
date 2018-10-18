@@ -68,7 +68,7 @@ public class TriggerActivity extends AppCompatActivity {
     }
 
     private String sendJson(String test) {
-        String url = "http://192.168.43.66:5000/location";
+        String url = "http://192.168.43.168:5000/location";
         String response = "";
         JSONObject postData = new JSONObject();
         try{

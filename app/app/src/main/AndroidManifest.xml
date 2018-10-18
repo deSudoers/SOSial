@@ -46,12 +46,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sosial.sudoers.sosial.MainActivity" />
         </activity>
-            android:label="Message"/>
-            android:name=".MessagingActivity"
         <activity
-            android:label="@string/trigger" />
-            android:name=".TriggerActivity"
+            android:label="Message"
+            android:name=".MessagingActivity"/>
         <activity
+            android:label="@string/trigger"
+            android:name=".TriggerActivity"/>
     </application>
 
 </manifest>
