@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,6 +20,23 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/loginIcon"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_gravity="center"
+        app:srcCompat="@mipmap/ic_launcher_foreground"
+        android:contentDescription="TODO" />
+
+    <TextView
+        android:id="@+id/cc"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:text="@string/sosial"
+        android:textStyle="bold"
+        android:textSize="25sp"/>
 
     <ScrollView
         android:id="@+id/login_form"
@@ -42,7 +60,8 @@
                     android:hint="@string/username"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:layout_margin="5dp" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -60,7 +79,8 @@
                     android:imeOptions="actionUnspecified"
                     android:inputType="textPassword"
                     android:maxLines="1"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:layout_margin="5dp"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -71,15 +91,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_sign_in"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:background="@drawable/rounded_button"
+                android:textColor="@android:color/white" />
 
             <TextView
                 android:id="@+id/register_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/sign_up"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:layout_margin="10dp"
+                android:padding="20dp"/>
 
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>

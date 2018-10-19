@@ -40,5 +40,6 @@
     <string name="title_activity_inbox">Inbox</string>
     <string name="title_activity_view_message">ViewMessage</string>
     <string name="sign_up">Sign Up</string>
+    <string name="sosial">SOSial</string>
 
 </resources>
