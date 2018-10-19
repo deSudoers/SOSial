@@ -114,6 +114,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         sp = getSharedPreferences("login", MODE_PRIVATE);
         sp.getString("token", "");
+        sp.getString("token2", "");
 
         if(sp.getBoolean("logged",  false)){
             sp.edit().putBoolean("logged", false).apply();
@@ -281,7 +282,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private String sendJson(String user, String password){
-        String url = "http://192.168.43.168:5000/login";
+        String url = "https://sosial.azurewebsites.net/login";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
@@ -319,8 +320,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 wr.writeBytes(params[1]);
                 wr.flush();
                 wr.close();
+                String cookie3 = httpURLConnection.getHeaderField(3);
                 String cookie = httpURLConnection.getHeaderField("Set-Cookie");
                 sp.edit().putString("token", cookie).apply();
+                sp.edit().putString("token2", cookie3).apply();
 
                 int response = httpURLConnection.getResponseCode();
                 if(response == HttpURLConnection.HTTP_OK){

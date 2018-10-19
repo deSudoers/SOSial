@@ -104,6 +104,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         sp = getSharedPreferences("login", MODE_PRIVATE);
         sp.getString("token", "");
+        sp.getString("token2", "");
         sp.getString("register_error", "An Error Occurred. Please Try Again.");
 
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
@@ -287,7 +288,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
 
     private String sendJson(String... params){
-        String url = "http://192.168.43.168:5000/register";
+        String url = "https://sosial.azurewebsites.net/register";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
@@ -328,9 +329,10 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
                 wr.writeBytes(params[1]);
                 wr.flush();
                 wr.close();
+                String cookie3 = httpURLConnection.getHeaderField(3);
                 String cookie = httpURLConnection.getHeaderField("Set-Cookie");
                 sp.edit().putString("token", cookie).apply();
-                Log.e("cook", sp.getString("token",""));
+                sp.edit().putString("token2", cookie3).apply();
 
                 int response = httpURLConnection.getResponseCode();
                 if(response == HttpURLConnection.HTTP_OK){

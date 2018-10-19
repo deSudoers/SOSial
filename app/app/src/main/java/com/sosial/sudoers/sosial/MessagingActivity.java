@@ -135,7 +135,7 @@ public class MessagingActivity extends AppCompatActivity {
     }
 
     private String sendJson(String id, String msg){
-        String url = "http://192.168.43.168:5000/message";
+        String url = "https://sosial.azurewebsites.net/message";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
@@ -169,6 +169,7 @@ public class MessagingActivity extends AppCompatActivity {
             HttpURLConnection httpURLConnection = null;
             try {
                 httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
                 httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
                 httpURLConnection.setRequestMethod("PUT");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json");

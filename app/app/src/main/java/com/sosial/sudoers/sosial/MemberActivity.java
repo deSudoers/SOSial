@@ -259,7 +259,7 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
     }
 
     private String sendJson(String email){
-        String url = "http://192.168.43.168:5000/family";
+        String url = "https://sosial.azurewebsites.net/family";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
@@ -288,6 +288,7 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
             HttpURLConnection httpURLConnection = null;
             try {
                 httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token2",""));
                 httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json");
@@ -341,7 +342,7 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
     private void removeMember() {
         int selected = mSpinnerlist.getSelectedItemPosition();
 
-        String id = sp.getString("userid", "").split(",")[selected];
+        String id = sp.getString("email", "").split(",")[selected];
         if(id != "") {
             String response = sendJson2(id);
 
@@ -370,11 +371,11 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
     }
 
     private String sendJson2(String id){
-        String url = "http://192.168.43.168:5000/family";
+        String url = "https://sosial.azurewebsites.net/family";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
-            postData.put("user_id", id);
+            postData.put("email", id);
             DeleteRequest sdd =  new DeleteRequest();
             response  = sdd.execute(url, postData.toString()).get();
         }
@@ -398,6 +399,7 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
             HttpURLConnection httpURLConnection = null;
             try {
                 httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
                 httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
                 httpURLConnection.setRequestMethod("DELETE");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json");
@@ -405,7 +407,6 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
                 httpURLConnection.setDoInput(true);
                 DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
                 wr.writeBytes(params[1]);
-                Log.e("member2", params[1]);
                 wr.flush();
                 wr.close();
                 int response = httpURLConnection.getResponseCode();

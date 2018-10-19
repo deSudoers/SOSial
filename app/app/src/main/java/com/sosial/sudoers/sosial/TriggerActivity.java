@@ -33,6 +33,7 @@ public class TriggerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_trigger);
         sp = getSharedPreferences("login", MODE_PRIVATE);
         sp.getString("token", "");
+        sp.getString("token2", "");
 
         triggerButton =  (Button) findViewById(R.id.trigger);
 
@@ -68,7 +69,7 @@ public class TriggerActivity extends AppCompatActivity {
     }
 
     private String sendJson(String test) {
-        String url = "http://192.168.43.168:5000/location";
+        String url = "https://sosial.azurewebsites.net/location";
         String response = "";
         JSONObject postData = new JSONObject();
         try{
@@ -96,6 +97,7 @@ public class TriggerActivity extends AppCompatActivity {
             HttpURLConnection httpURLConnection = null;
             try {
                 httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
                 httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json");

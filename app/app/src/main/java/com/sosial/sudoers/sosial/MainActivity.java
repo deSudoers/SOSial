@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity
 
         sp = getSharedPreferences("login", MODE_PRIVATE);
         sp.getString("token", "");
+        sp.getString("token2", "");
 
         mProfileInfo = (TextView) findViewById(R.id.profile);
 
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity
         mName = (TextView) headerView.findViewById(R.id.name_id);
         mEmail = (TextView) headerView.findViewById(R.id.textView);
 
-        String url = "http://192.168.43.168:5000/profile";
+        String url = "https://sosial.azurewebsites.net/profile";
         GetProfile gp = new GetProfile();
         try {
             updateProfile(gp.execute(url).get());
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity
             HttpURLConnection httpURLConnection = null;
             try {
                 httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
                 httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
                 httpURLConnection.setRequestMethod("GET");
                 httpURLConnection.setDoInput(true);
@@ -214,9 +216,27 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private String sendJson(){
+        String url = "https://sosial.azurewebsites.net/logout";
+        String response = "";
+        try{
+//            response  = sdd.execute(url).get();
+        }
+//        catch (JSONException e){
+//            e.printStackTrace();
+//        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            return response;
+        }
+    }
+
     public void goToLoginActivity(){
-        sp.edit().putBoolean("logged", false);
-        sp.edit().putString("token", "");
+        sp.edit().putBoolean("logged", false).apply();
+        sp.edit().putString("token", "").apply();
+        sp.edit().putString("token2", "").apply();
         Intent i = new Intent(this, LoginActivity.class);
         startActivity(i);
     }
