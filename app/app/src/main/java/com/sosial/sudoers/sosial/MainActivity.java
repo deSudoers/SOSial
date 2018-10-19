@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity
             sp.edit().putString("myid", json.getString("user_id")).apply();
             sp.edit().putString("email", json.getString("family_email")).apply();
             sp.edit().putString("name", json.getString("family_name")).apply();
+            sp.edit().putString("myname", json.getString("name")).apply();
             sp.edit().putString("userid", json.getString("family_id")).apply();
         }
         catch (JSONException e){

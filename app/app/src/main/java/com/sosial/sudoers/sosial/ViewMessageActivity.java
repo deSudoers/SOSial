@@ -7,10 +7,15 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 public class ViewMessageActivity extends AppCompatActivity {
 
     SharedPreferences inboxsp;
+    private TextView messageText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,8 +24,10 @@ public class ViewMessageActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         inboxsp = getSharedPreferences("currentMessage",MODE_PRIVATE);
-        String title = inboxsp.getString("currentName","");
+        String title = inboxsp.getString("name","");
         setTitle(title);
+        messageText = (TextView) findViewById(R.id.viewmsgtext);
+        messageText.setText(inboxsp.getString("msgtext",""));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
