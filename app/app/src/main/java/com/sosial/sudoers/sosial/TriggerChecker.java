@@ -6,15 +6,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Method;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -68,16 +65,10 @@ public class TriggerChecker extends Service {
 
     private Timer timer;
     private TimerTask timerTask;
-    long oldTime=0;
 
     public void startTimer() {
-        //set a new Timer
         timer = new Timer();
-
-        //initialize the TimerTask's job
         initializeTimerTask();
-
-        //schedule the timer, to wake up every 1 second
         timer.schedule(timerTask, 1000, 1000); //
     }
 
@@ -86,10 +77,9 @@ public class TriggerChecker extends Service {
             public void run() {
                 sp = getSharedPreferences("login", MODE_PRIVATE);
                 if(sp.getBoolean("trigger",true)) {
-
                     try {
                         if(!wifiManager.isWifiEnabled()) {
-                            Log.e("wifi_discoverr", "alreadY");
+                            Log.e("wifi_discoverr", "enable wifi");
                             wifiManager.setWifiEnabled(true);
                             iTurnedOn = true;
                         }
@@ -101,10 +91,23 @@ public class TriggerChecker extends Service {
                     sp.edit().putBoolean("trigger", true).apply();
                     new NotificationSender(TriggerChecker.this, "", "", "Alert", "Disaster has Occurred");
                     if(!trigger_done) {
+                        trigger_done = true;
+
+                        try {
+                            Method method1 = mManager.getClass().getMethod("enableP2p", WifiP2pManager.Channel.class);
+                            method1.invoke(mManager, mChannel);
+                            Log.e("wifi_discover", "passed");
+                            //Toast.makeText(getActivity(), "method found",
+                            //       Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            Log.e("wifi_discover", "in except");
+                            //Toast.makeText(getActivity(), "method did not found",
+                            //   Toast.LENGTH_SHORT).show();
+                        }
 
                         receiver = new WifiBroadcastReceiver(mManager, mChannel, TriggerChecker.this);
                         registerReceiver(receiver, intentFilter);
-
+                        Log.e("wifi_discover", "registered");
                     }
                 }
                 else {
@@ -114,6 +117,7 @@ public class TriggerChecker extends Service {
                     }
                     trigger_done = false;
                     try {
+                        Log.e("wifi_discover", "unregistered");
                         unregisterReceiver(receiver);
                     }
                     catch (Exception e){
@@ -121,15 +125,24 @@ public class TriggerChecker extends Service {
                     }
                 }
 
-//                try {
-//
-//
-//
-//                }
-//                catch (Exception e){
-//                    e.printStackTrace();
-//                    Log.e("try_catch", e.toString());
-//                }
+                mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+
+                    @Override
+                    public void onSuccess() {
+                        Log.e("wifi_discover", "success");
+                        // Code for when the discovery initiation is successful goes here.
+                        // No services have actually been discovered yet, so this method
+                        // can often be left blank. Code for peer discovery goes in the
+                        // onReceive method, detailed below.
+                    }
+
+                    @Override
+                    public void onFailure(int reasonCode) {
+                        Log.e("wifi_discover", "failed");
+                        // Code for when the discovery initiation fails goes here.
+                        // Alert the user that something went wrong.
+                    }
+                });
             }
         };
     }
@@ -146,33 +159,6 @@ public class TriggerChecker extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
-    private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
-
-    private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
-        @Override
-        public void onPeersAvailable(WifiP2pDeviceList peerList) {
-
-            List<WifiP2pDevice> refreshedPeers = (List<WifiP2pDevice>) peerList.getDeviceList();
-            if (!refreshedPeers.equals(peers)) {
-                peers.clear();
-                peers.addAll(refreshedPeers);
-
-                // If an AdapterView is backed by this data, notify it
-                // of the change. For instance, if you have a ListView of
-                // available peers, trigger an update.
-//                ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
-
-                // Perform any other updates needed based on the new list of
-                // peers connected to the Wi-Fi P2P network.
-            }
-
-            if (peers.size() == 0) {
-                Log.d("wifidirection", "No devices found");
-                return;
-            }
-        }
-    };
 
     public static void setIsWifiP2pEnabled(boolean activated){
         wifip2p = activated;
