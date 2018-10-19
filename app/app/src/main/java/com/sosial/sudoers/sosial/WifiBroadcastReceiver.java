@@ -3,6 +3,7 @@ package com.sosial.sudoers.sosial;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.NetworkInfo;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -83,7 +84,23 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
             // that.
 
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
+            try {
+                NetworkInfo networkState = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+                WifiP2pInfo wifiInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_INFO);
+                WifiP2pDevice device = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
+                Log.e("wifi_discover", wifiInfo.toString());
+                Log.e("wifi_discover", device.deviceAddress);
+                if (networkState.isConnected()) {
+                    //set client state so that all needed fields to make a transfer are ready
 
+                    //activity.setTransferStatus(true);
+//                cxt.setNetworkToReadyState(true, wifiInfo, device);
+//                activity.setClientStatus("Connection Status: Connected");
+                }
+            }
+            catch (Exception e){
+                Log.e("wifi_discover", e.toString());
+            }
             Log.e("wifi_discover", "conn changed");
             // Connection state changed! We should probably do something about
             // that.
@@ -107,7 +124,7 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
 
             WifiP2pConfig config = new WifiP2pConfig();
             config.deviceAddress = device.deviceAddress;
-            Log.e("wifi_discover","address"+config.deviceAddress.toString() );
+            Log.e("wifi_discover","address"+config.deviceAddress);
             config.wps.setup = WpsInfo.PBC;
 
             manager.connect(channel, config, new WifiP2pManager.ActionListener() {

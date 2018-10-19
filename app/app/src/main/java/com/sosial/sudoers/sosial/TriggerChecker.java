@@ -69,7 +69,7 @@ public class TriggerChecker extends Service {
     public void startTimer() {
         timer = new Timer();
         initializeTimerTask();
-        timer.schedule(timerTask, 1000, 1000); //
+        timer.schedule(timerTask, 10000, 10000); //
     }
 
     public void initializeTimerTask() {
