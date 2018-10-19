@@ -10,9 +10,9 @@
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in">Log in</string>
     <string name="action_sign_up">Sign up</string>
-    <string name="action_sign_in_short">Sign in</string>
+    <string name="action_sign_in_short">Log in</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
@@ -39,5 +39,6 @@
     <string name="inbox">Inbox</string>
     <string name="title_activity_inbox">Inbox</string>
     <string name="title_activity_view_message">ViewMessage</string>
+    <string name="sign_up">Sign Up</string>
 
 </resources>

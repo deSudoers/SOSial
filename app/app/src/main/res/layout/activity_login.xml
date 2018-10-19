@@ -77,7 +77,7 @@
                 android:id="@+id/register_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Register"
+                android:text="@string/sign_up"
                 android:textAlignment="center" />
 
         </LinearLayout>
