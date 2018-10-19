@@ -89,8 +89,18 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
                 WifiP2pInfo wifiInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_INFO);
                 WifiP2pDevice device = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
                 Log.e("wifi_discover", wifiInfo.toString());
-                Log.e("wifi_discover", device.deviceAddress);
+                Log.e("wifi_discover", networkState.toString());
                 if (networkState.isConnected()) {
+                    manager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
+                        @Override
+                        public void onConnectionInfoAvailable(WifiP2pInfo info) {
+                            Client c = new Client(info,"1", "2");
+                            Log.e("wifi_client", c.get()+"extra");
+                        }
+                    });
+
+
+
                     //set client state so that all needed fields to make a transfer are ready
 
                     //activity.setTransferStatus(true);
@@ -133,6 +143,9 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
                 public void onSuccess() {
                     // WiFiDirectBroadcastReceiver notifies us. Ignore for now.
                     Log.e("wifi_discover","Connected");
+                    Server s = new Server("11", "22");
+
+                    Log.e("wifi_server", s.get()+"extra");
                 }
 
                 @Override
