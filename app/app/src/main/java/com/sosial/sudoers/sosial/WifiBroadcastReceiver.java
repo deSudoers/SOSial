@@ -7,6 +7,7 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -44,7 +45,40 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
             }
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 
-            Log.e("wifi_discover", "changed");
+            if (manager != null) {
+                manager.requestPeers(channel, peerListListener);
+                Log.e("wifi_discover","request_peers");
+            }
+
+
+            peerListListener = new WifiP2pManager.PeerListListener() {
+                @Override
+                public void onPeersAvailable(WifiP2pDeviceList peerList) {
+                    Log.e("wifi_discover", "onPeers");
+                    Collection<WifiP2pDevice> refreshedPeers = peerList.getDeviceList();
+                    if (!refreshedPeers.equals(peers)) {
+                        peers.clear();
+                        peers.addAll(refreshedPeers);
+
+                        // If an AdapterView is backed by this data, notify it
+                        // of the change. For instance, if you have a ListView of
+                        // available peers, trigger an update.
+//                        ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
+
+                        // Perform any other updates needed based on the new list of
+                        // peers connected to the Wi-Fi P2P network.
+                    }
+
+                    if (peers.size() == 0) {
+                        Log.d("wifi_discover", "No devices found");
+                        return;
+                    }
+                }
+            };
+
+            connectall();
+
+            Log.e("wifi_discover", "peer_size"+peers.size());
             // The peer list has changed! We should probably do something about
             // that.
 
@@ -61,6 +95,34 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
 //                    WifiP2pManager.EXTRA_WIFI_P2P_DEVICE));
             Log.e("wifi_discover", "device changed");
 
+        }
+    }
+
+    public void connectall(){
+        for(int i = 0; i < peers.size(); ++i) {
+            // Picking the first device found on the network.
+            WifiP2pDevice device = peers.get(i);
+            WifiP2pInfo info = new WifiP2pInfo();
+            Log.e("wifi_discover", device.isGroupOwner()+"");
+
+            WifiP2pConfig config = new WifiP2pConfig();
+            config.deviceAddress = device.deviceAddress;
+            Log.e("wifi_discover","address"+config.deviceAddress.toString() );
+            config.wps.setup = WpsInfo.PBC;
+
+            manager.connect(channel, config, new WifiP2pManager.ActionListener() {
+
+                @Override
+                public void onSuccess() {
+                    // WiFiDirectBroadcastReceiver notifies us. Ignore for now.
+                    Log.e("wifi_discover","Connected");
+                }
+
+                @Override
+                public void onFailure(int reason) {
+                    Log.e("wifi_discover","Connection Failed");
+                }
+            });
         }
     }
 }

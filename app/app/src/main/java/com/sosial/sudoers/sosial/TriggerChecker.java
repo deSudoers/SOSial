@@ -100,7 +100,7 @@ public class TriggerChecker extends Service {
                             //Toast.makeText(getActivity(), "method found",
                             //       Toast.LENGTH_SHORT).show();
                         } catch (Exception e) {
-                            Log.e("wifi_discover", "in except");
+                            Log.e("wifi_discover", e.toString());
                             //Toast.makeText(getActivity(), "method did not found",
                             //   Toast.LENGTH_SHORT).show();
                         }
@@ -129,7 +129,6 @@ public class TriggerChecker extends Service {
 
                     @Override
                     public void onSuccess() {
-                        Log.e("wifi_discover", "success");
                         // Code for when the discovery initiation is successful goes here.
                         // No services have actually been discovered yet, so this method
                         // can often be left blank. Code for peer discovery goes in the
@@ -138,7 +137,6 @@ public class TriggerChecker extends Service {
 
                     @Override
                     public void onFailure(int reasonCode) {
-                        Log.e("wifi_discover", "failed");
                         // Code for when the discovery initiation fails goes here.
                         // Alert the user that something went wrong.
                     }
