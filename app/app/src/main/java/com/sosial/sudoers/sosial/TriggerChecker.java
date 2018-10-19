@@ -1,20 +1,11 @@
 package com.sosial.sudoers.sosial;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import java.util.Timer;
@@ -22,7 +13,6 @@ import java.util.TimerTask;
 
 public class TriggerChecker extends Service {
     private SharedPreferences sp;
-    public int counter=0;
     Context cxt;
     public TriggerChecker(Context applicationContext) {
         super();
@@ -65,37 +55,11 @@ public class TriggerChecker extends Service {
             public void run() {
                 sp = getSharedPreferences("login", MODE_PRIVATE);
                 try {
-                    NotificationCompat.Builder mBuilder =
-                            new NotificationCompat.Builder(TriggerChecker.this, "notify_001");
-                    Intent ii = new Intent(TriggerChecker.this, TriggerChecker.class);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(TriggerChecker.this, 0, ii, 0);
-
-                    NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
-                    bigText.setBigContentTitle("Title");
-                    bigText.setSummaryText("Text in detail");
-
-                    mBuilder.setContentIntent(pendingIntent);
-                    mBuilder.setSmallIcon(R.mipmap.ic_launcher_round);
-                    mBuilder.setContentTitle("Your Title");
-                    mBuilder.setContentText("Your text");
-                    mBuilder.setPriority(Notification.PRIORITY_MAX);
-                    mBuilder.setStyle(bigText);
-
-                    NotificationManager mNotificationManager =
-                            (NotificationManager) TriggerChecker.this.getSystemService(Context.NOTIFICATION_SERVICE);
-
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        NotificationChannel channel = new NotificationChannel("notify_001",
-                                "Channel human readable title",
-                                NotificationManager.IMPORTANCE_DEFAULT);
-                        mNotificationManager.createNotificationChannel(channel);
-                    }
-
-                    mNotificationManager.notify(0, mBuilder.build());
+                    new NotificationSender(TriggerChecker.this, "Alert", "Disaster has Occurred", "Alert", "Disaster has Occurred");
                 }
                 catch (Exception e){
                     e.printStackTrace();
+                    Log.e("try_catch", e.toString());
                 }
             }
         };
