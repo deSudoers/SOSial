@@ -93,7 +93,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
         //Remove title bar
 
-
         mTriggerChecker = new TriggerChecker(getCtx());
         mServiceIntent = new Intent(getCtx(), mTriggerChecker.getClass());
         if (!isMyServiceRunning(mTriggerChecker.getClass())) {

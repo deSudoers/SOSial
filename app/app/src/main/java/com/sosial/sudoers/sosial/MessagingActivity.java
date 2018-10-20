@@ -68,6 +68,7 @@ public class MessagingActivity extends AppCompatActivity {
     private EditText mMessage;
     private Spinner mSpinner;
     private SharedPreferences sp;
+    private SharedPreferences sp2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,7 @@ public class MessagingActivity extends AppCompatActivity {
         setupActionBar();
 
         sp = getSharedPreferences("login", MODE_PRIVATE);
+        sp2 = getSharedPreferences("allmessages", MODE_PRIVATE);
         // Set up the login form.
         mSpinner = (Spinner) findViewById(R.id.spinner2);
 
@@ -140,11 +142,15 @@ public class MessagingActivity extends AppCompatActivity {
         JSONObject postData = new JSONObject();
         try{
             JSONObject postDatai = new JSONObject();
-            postDatai.put("sender_id", sp.getString("myid", ""));
+            String myid = sp.getString("myid", "");
+            postDatai.put("sender_id", myid);
             postDatai.put("receiver_id", id);
             postDatai.put("message", msg);
-            postDatai.put("unique_key", "1234");
+            String key = Password.hashPassword(sp.getString("myid", "")+msg+id);
+            postDatai.put("unique_key", key);
             postData.put("0", postDatai);
+
+            addMessagetoDatabase(myid, id, msg, key);
 
             SendRequest sdd =  new SendRequest();
             response  = sdd.execute(url, postData.toString()).get();
@@ -197,5 +203,37 @@ public class MessagingActivity extends AppCompatActivity {
             super.onPostExecute(result);
             Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
         }
+    }
+
+    public void addMessagetoDatabase(String myid, String receiver, String msg, String key){
+        int count = sp2.getInt("allmymessagescount",0);
+        for(int i = 0; i < count; ++i){
+            try {
+                JSONObject json = new JSONObject(sp2.getString("allmymessages" + count, ""));
+                String k = json.getString("key");
+                if(key.equals(k)){
+                    return;
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        JSONObject mssg = new JSONObject();
+        try {
+            mssg.put("sender", myid);
+            mssg.put("receiver", receiver);
+            String name = msg.split("#")[0];
+            String msssg = msg.split("#")[1];
+            mssg.put("name", name);
+            mssg.put("message", msssg);
+            mssg.put("key", key);
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+
+        sp2.edit().putString("allmymessages"+count,mssg.toString()).apply();
+        sp2.edit().putInt("allmymessagescount", count++).apply();
     }
 }
