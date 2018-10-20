@@ -35,11 +35,19 @@
                 android:id="@+id/textView2"
                 android:layout_width="36dp"
                 android:layout_height="wrap_content"
-                android:text="@string/to" />
+                android:text="@string/to"
+                android:textStyle="bold"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="20dp"
+                android:textSize="22sp"/>
 
             <Spinner
                 android:id="@+id/spinner2"
                 android:layout_width="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="20dp"
                 android:layout_height="51dp" />
 
             <android.support.design.widget.TextInputLayout
@@ -59,6 +67,7 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:gravity="top"
+                    android:layout_margin="20dp"
                     android:hint="@string/enter_message"
                     android:inputType="textMultiLine" />
 
@@ -71,7 +80,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_send"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_button"
+                android:layout_margin="25dp"/>
 
         </LinearLayout>
     </ScrollView>

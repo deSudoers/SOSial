@@ -91,7 +91,6 @@ public class Inbox extends AppCompatActivity {
                 msgJsonKey = "allmymessages" + i;
                 msgJsonStr = allmessages.getString(msgJsonKey,"");
                 msgJson = new JSONObject(msgJsonStr);
-                msgJson = new JSONObject(json);
 
                 receiverId = msgJson.getString("receiver");setTitle("hello");
                 setTitle("hello23");
