@@ -75,72 +75,72 @@ public class TriggerChecker extends Service {
     public void initializeTimerTask() {
         timerTask = new TimerTask() {
             public void run() {
-                sp = getSharedPreferences("login", MODE_PRIVATE);
-                if(sp.getBoolean("trigger",true)) {
-                    try {
-                        if(!wifiManager.isWifiEnabled()) {
-                            Log.e("wifi_discoverr", "enable wifi");
-                            wifiManager.setWifiEnabled(true);
-                            iTurnedOn = true;
-                        }
-                    }
-                    catch (Exception e){
-                        Log.e("wifi_discoverr", e.toString());
-                    }
-
-                    sp.edit().putBoolean("trigger", true).apply();
-                    new NotificationSender(TriggerChecker.this, "", "", "Alert", "Disaster has Occurred");
-                    if(!trigger_done) {
-                        trigger_done = true;
-
-                        try {
-                            Method method1 = mManager.getClass().getMethod("enableP2p", WifiP2pManager.Channel.class);
-                            method1.invoke(mManager, mChannel);
-                            Log.e("wifi_discover", "passed");
-                            //Toast.makeText(getActivity(), "method found",
-                            //       Toast.LENGTH_SHORT).show();
-                        } catch (Exception e) {
-//                            Log.e("wifi_discover", e.toString());
-                            //Toast.makeText(getActivity(), "method did not found",
-                            //   Toast.LENGTH_SHORT).show();
-                        }
-
-                        receiver = new WifiBroadcastReceiver(mManager, mChannel, TriggerChecker.this);
-                        registerReceiver(receiver, intentFilter);
-                        Log.e("wifi_discover", "registered");
-                    }
-                }
-                else {
-                    if(iTurnedOn){
-                        wifiManager.setWifiEnabled(false);
-                        iTurnedOn = false;
-                    }
-                    trigger_done = false;
-                    try {
-                        Log.e("wifi_discover", "unregistered");
-                        unregisterReceiver(receiver);
-                    }
-                    catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-
-                mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
-
-                    @Override
-                    public void onSuccess() {
-                        // Code for when the discovery initiation is successful goes here.
-                        // No services have actually been discovered yet, so this method
-                        // can often be left blank. Code for peer discovery goes in the
-                        // onReceive method, detailed below.
-                    }
-
-                    @Override
-                    public void onFailure(int reasonCode) {
-                        // Code for when the discovery initiation fails goes here.
-                        // Alert the user that something went wrong.
-                    }
-                });
+            sp = getSharedPreferences("login", MODE_PRIVATE);
+//                if(sp.getBoolean("trigger",true)) {
+//                    try {
+//                        if(!wifiManager.isWifiEnabled()) {
+//                            Log.e("wifi_discoverr", "enable wifi");
+//                            wifiManager.setWifiEnabled(true);
+//                            iTurnedOn = true;
+//                        }
+//                    }
+//                    catch (Exception e){
+//                        Log.e("wifi_discoverr", e.toString());
+//                    }
+//
+//                    sp.edit().putBoolean("trigger", true).apply();
+//                    new NotificationSender(TriggerChecker.this, "", "", "Alert", "Disaster has Occurred");
+//                    if(!trigger_done) {
+//                        trigger_done = true;
+//
+//                        try {
+//                            Method method1 = mManager.getClass().getMethod("enableP2p", WifiP2pManager.Channel.class);
+//                            method1.invoke(mManager, mChannel);
+//                            Log.e("wifi_discover", "passed");
+//                            //Toast.makeText(getActivity(), "method found",
+//                            //       Toast.LENGTH_SHORT).show();
+//                        } catch (Exception e) {
+//    //                            Log.e("wifi_discover", e.toString());
+//                            //Toast.makeText(getActivity(), "method did not found",
+//                            //   Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                        receiver = new WifiBroadcastReceiver(mManager, mChannel, TriggerChecker.this);
+//                        registerReceiver(receiver, intentFilter);
+//                        Log.e("wifi_discover", "registered");
+//                    }
+//                }
+//                else {
+//                    if(iTurnedOn){
+//                        wifiManager.setWifiEnabled(false);
+//                        iTurnedOn = false;
+//                    }
+//                    trigger_done = false;
+//                    try {
+//                        Log.e("wifi_discover", "unregistered");
+//                        unregisterReceiver(receiver);
+//                    }
+//                    catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+//
+//                    @Override
+//                    public void onSuccess() {
+//                        // Code for when the discovery initiation is successful goes here.
+//                        // No services have actually been discovered yet, so this method
+//                        // can often be left blank. Code for peer discovery goes in the
+//                        // onReceive method, detailed below.
+//                    }
+//
+//                    @Override
+//                    public void onFailure(int reasonCode) {
+//                        // Code for when the discovery initiation fails goes here.
+//                        // Alert the user that something went wrong.
+//                    }
+//                });
             }
         };
     }

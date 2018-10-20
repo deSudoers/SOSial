@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
     public void updateProfile(String profile){
         String name = "";
         String email = "";
