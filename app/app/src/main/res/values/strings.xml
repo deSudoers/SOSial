@@ -25,7 +25,7 @@
     <string name="last_name">Last Name</string>
     <string name="mobile_no">Mobile Number</string>
     <string name="username">User Name</string>
-    <string name="title_activity_member">Members</string>
+    <string name="title_activity_member">Family</string>
     <string name="add_member">Add Member</string>
     <string name="remove_member">Remove Member</string>
     <string name="trigger">Trigger</string>
@@ -50,5 +50,7 @@
     <string name="profile_name_title">Name</string>
     <string name="profile_email_title">E-mail</string>
     <string name="profile_number_title">Mobile Number</string>
+    <string name="members_list">Members List</string>
+    <string name="add_members_title">Add Member</string>
 
 </resources>
