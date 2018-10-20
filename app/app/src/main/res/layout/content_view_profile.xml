@@ -67,18 +67,19 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"
             android:textSize="20sp" />
+
         <Button
-            android:id="@+id/email_sign_in_button"
+            android:id="@+id/viewFamily"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Family Members"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
             android:layout_marginTop="50dp"
-            android:textStyle="bold"
+            android:layout_marginRight="20dp"
             android:background="@drawable/rounded_button"
-            android:textColor="@android:color/white" />
+            android:text="Family Members"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
