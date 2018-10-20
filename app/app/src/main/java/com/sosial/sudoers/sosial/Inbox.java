@@ -116,6 +116,17 @@ public class Inbox extends AppCompatActivity {
         }
     }
 
+    private void getMessageSender(int position) {
+        JSONObject currentMessage = new JSONObject();
+        try {
+            currentMessage = messageBundle.getJSONObject(String.valueOf(position));
+            msg = currentMessage.getString("name");
+        } catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     private void viewMessage() {
         Intent i = new Intent(this,ViewMessageActivity.class);
         startActivity(i);

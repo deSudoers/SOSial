@@ -6,7 +6,7 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">SOSial</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -41,5 +41,10 @@
     <string name="title_activity_view_message">ViewMessage</string>
     <string name="sign_up">Sign Up</string>
     <string name="sosial">SOSial</string>
+    <string name="family">Family</string>
+    <string name="share_location">Share Location</string>
+    <string name="logout">Logout</string>
+    <string name="profile">Profile</string>
+    <string name="account">Account</string>
 
 </resources>
