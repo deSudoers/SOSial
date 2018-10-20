@@ -253,4 +253,21 @@ public class MessagingActivity extends AppCompatActivity {
             }
         }
     }
+
+    public void addUsers(String allusers){
+        String users[] = allusers.split(",");
+        String already[] = sp.getString("allmyusers", sp.getString("myid", "")+",").split(",");
+        for(String usr: users){
+            int flag = 0;
+            for(String alr: already){
+                if(usr.equals(alr)){
+                    flag = 1;
+                    break;
+                }
+            }
+            if(flag == 0){
+                sp.edit().putString("allmyusers", sp.getString("allmyusers", sp.getString("myid", ""))+usr+",").apply();
+            }
+        }
+    }
 }
