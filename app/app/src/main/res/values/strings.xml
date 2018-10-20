@@ -46,5 +46,9 @@
     <string name="logout">Logout</string>
     <string name="profile">Profile</string>
     <string name="account">Account</string>
+    <string name="title_activity_view_profile">My Profile</string>
+    <string name="profile_name_title">Name</string>
+    <string name="profile_email_title">E-mail</string>
+    <string name="profile_number_title">Mobile Number</string>
 
 </resources>

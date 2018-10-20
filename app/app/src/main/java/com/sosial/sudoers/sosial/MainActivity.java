@@ -111,6 +111,8 @@ public class MainActivity extends AppCompatActivity
             sp.edit().putString("myname", json.getString("name")).apply();
             temp = json.getString("family_id");
             sp.edit().putString("userid", temp.equals("")?temp:temp+",").apply();
+            sp.edit().putString("myemail", json.getString("email")).apply();
+            sp.edit().putString("mynumber", json.getString("mobile")).apply();
         }
         catch (JSONException e){
             e.printStackTrace();
@@ -209,6 +211,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_profile) {
+            viewMyProfile();
 
         } else if (id == R.id.nav_logout) {
             goToLoginActivity();
@@ -219,6 +222,8 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 
     private String sendJson(){
         String url = "https://sosial.azurewebsites.net/logout";
@@ -247,6 +252,11 @@ public class MainActivity extends AppCompatActivity
 
     public void goToMemberActivity(){
         Intent i = new Intent(this, MemberActivity.class);
+        startActivity(i);
+    }
+
+    private void viewMyProfile() {
+        Intent i = new Intent(this, ViewProfileActivity.class);
         startActivity(i);
     }
 
