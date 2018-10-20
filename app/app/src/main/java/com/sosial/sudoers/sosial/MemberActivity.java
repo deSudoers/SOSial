@@ -122,7 +122,7 @@ public class MemberActivity extends AppCompatActivity implements LoaderCallbacks
     }
 
     public void changeList(){
-        String names[] = sp.getString("name", "").split(",");
+        String names[] = sp.getString("email", "").split(",");
         ArrayAdapter<String> adapter= new ArrayAdapter<>(MemberActivity.this, android.R.layout.simple_spinner_dropdown_item, names);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerlist.setAdapter(adapter);

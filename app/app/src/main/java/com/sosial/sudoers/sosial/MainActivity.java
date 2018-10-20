@@ -104,10 +104,13 @@ public class MainActivity extends AppCompatActivity
             email = json.getString("email");
             mEmail.setText(email);
             sp.edit().putString("myid", json.getString("user_id")).apply();
-            sp.edit().putString("email", json.getString("family_email")).apply();
-            sp.edit().putString("name", json.getString("family_name")).apply();
+            String temp = json.getString("family_email");
+            sp.edit().putString("email", temp.equals("")?temp:temp+",").apply();
+            temp = json.getString("family_name");
+            sp.edit().putString("name", temp.equals("")?temp:temp+",").apply();
             sp.edit().putString("myname", json.getString("name")).apply();
-            sp.edit().putString("userid", json.getString("family_id")).apply();
+            temp = json.getString("family_id");
+            sp.edit().putString("userid", temp.equals("")?temp:temp+",").apply();
         }
         catch (JSONException e){
             e.printStackTrace();
