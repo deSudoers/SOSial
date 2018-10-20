@@ -38,10 +38,10 @@
         android:textStyle="bold"
         android:textSize="25sp"/>
 
-    <ScrollView
-        android:id="@+id/login_form"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <!--<ScrollView-->
+        <!--android:id="@+id/login_form"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
 
         <LinearLayout
             android:id="@+id/email_login_form"
@@ -97,14 +97,15 @@
 
             <TextView
                 android:id="@+id/register_text_view"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sign_up"
                 android:textAlignment="center"
                 android:layout_margin="10dp"
-                android:padding="20dp"/>
+                android:padding="20dp"
+                android:layout_gravity="center"/>
 
         </LinearLayout>
-    </ScrollView>
+    <!--</ScrollView>-->
 
 </LinearLayout>

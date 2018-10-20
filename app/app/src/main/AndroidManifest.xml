@@ -25,11 +25,13 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,7 +41,8 @@
         <activity
             android:name=".RegisterActivity"
             android:label="@string/title_activity_register"
-            android:parentActivityName=".LoginActivity">
+            android:parentActivityName=".LoginActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sosial.sudoers.sosial.LoginActivity" />
@@ -47,18 +50,21 @@
         <activity
             android:name=".MemberActivity"
             android:label="@string/title_activity_member"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sosial.sudoers.sosial.MainActivity" />
         </activity>
         <activity
             android:name=".TriggerActivity"
-            android:label="@string/trigger" />
+            android:label="@string/trigger"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MessagingActivity"
             android:label="@string/title_activity_messaging"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sosial.sudoers.sosial.MainActivity" />
@@ -67,7 +73,8 @@
             android:name=".Inbox"
             android:label="@string/title_activity_inbox"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sosial.sudoers.sosial.MainActivity" />
