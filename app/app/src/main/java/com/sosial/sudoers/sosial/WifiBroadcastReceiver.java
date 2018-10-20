@@ -13,6 +13,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +23,6 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
     private WifiP2pManager.Channel channel;
     private Context cxt;
     private List<WifiP2pDevice> peers = new ArrayList<>();
-    private WifiP2pManager.PeerListListener peerListListener;
 
 
     WifiBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel, Context cxt){
@@ -47,65 +47,48 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 
             if (manager != null) {
-                manager.requestPeers(channel, peerListListener);
-                Log.e("wifi_discover","request_peers");
+                manager.requestPeers(channel, new WifiP2pManager.PeerListListener() {
+                    @Override
+                    public void onPeersAvailable(WifiP2pDeviceList peers) {
+                        for(WifiP2pDevice wd: peers.getDeviceList()){
+                            connectToPeer(wd);
+                        }
+                        Log.e("wifi_peers", "peer_size"+peers.getDeviceList().size());
+                    }
+                });
+
             }
-
-
-            peerListListener = new WifiP2pManager.PeerListListener() {
-                @Override
-                public void onPeersAvailable(WifiP2pDeviceList peerList) {
-                    Log.e("wifi_discover", "onPeers");
-                    Collection<WifiP2pDevice> refreshedPeers = peerList.getDeviceList();
-                    if (!refreshedPeers.equals(peers)) {
-                        peers.clear();
-                        peers.addAll(refreshedPeers);
-
-                        // If an AdapterView is backed by this data, notify it
-                        // of the change. For instance, if you have a ListView of
-                        // available peers, trigger an update.
-//                        ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
-
-                        // Perform any other updates needed based on the new list of
-                        // peers connected to the Wi-Fi P2P network.
-                    }
-
-                    if (peers.size() == 0) {
-                        Log.d("wifi_discover", "No devices found");
-                        return;
-                    }
-                }
-            };
-
-            connectall();
-
-            Log.e("wifi_discover", "peer_size"+peers.size());
             // The peer list has changed! We should probably do something about
             // that.
 
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             try {
-                NetworkInfo networkState = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
                 WifiP2pInfo wifiInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_INFO);
-                WifiP2pDevice device = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
-                Log.e("wifi_discover", wifiInfo.toString());
-                Log.e("wifi_discover", networkState.toString());
-                if (networkState.isConnected()) {
+                Log.e("wifi_discoverline69", wifiInfo.toString());
+
+                if (manager == null) {
+                    return;
+                }
+                NetworkInfo networkInfo = (NetworkInfo) intent
+                        .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+                Log.e("wifi_discover", "After network info");
+
+                if (networkInfo.isConnected()) {
                     manager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
+
                         @Override
                         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-                            Client c = new Client(info,"1", "2");
-                            Log.e("wifi_client", c.get()+"extra");
+                            Log.e("wifi_discover", "network info avail");
+                            Log.e("wifi_discover_86", info.toString());
+                            if (info.isGroupOwner) {
+                                Server s = new Server("11", "22");
+                                Log.e("wifi_server", s.get() + "extra");
+                            } else {
+                                Client c = new Client(new WifiP2pInfo(), "1", "2");
+                                Log.e("wifi_client", c.get() + "extra");
+                            }
                         }
                     });
-
-
-
-                    //set client state so that all needed fields to make a transfer are ready
-
-                    //activity.setTransferStatus(true);
-//                cxt.setNetworkToReadyState(true, wifiInfo, device);
-//                activity.setClientStatus("Connection Status: Connected");
                 }
             }
             catch (Exception e){
@@ -125,34 +108,26 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    public void connectall(){
-        for(int i = 0; i < peers.size(); ++i) {
-            // Picking the first device found on the network.
-            WifiP2pDevice device = peers.get(i);
-            WifiP2pInfo info = new WifiP2pInfo();
-            Log.e("wifi_discover", device.isGroupOwner()+"");
+    public void connectToPeer(WifiP2pDevice peer){
+        // Picking the first device found on the network.;
+        WifiP2pInfo info = new WifiP2pInfo();
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = peer.deviceAddress;
+        Log.e("wifi_discover_master","address"+config.deviceAddress);
 
-            WifiP2pConfig config = new WifiP2pConfig();
-            config.deviceAddress = device.deviceAddress;
-            Log.e("wifi_discover","address"+config.deviceAddress);
-            config.wps.setup = WpsInfo.PBC;
+        manager.connect(channel, config, new WifiP2pManager.ActionListener() {
 
-            manager.connect(channel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                // WiFiDirectBroadcastReceiver notifies us. Ignore for now.
+                Log.e("wifi_discover","Connected");
+            }
 
-                @Override
-                public void onSuccess() {
-                    // WiFiDirectBroadcastReceiver notifies us. Ignore for now.
-                    Log.e("wifi_discover","Connected");
-                    Server s = new Server("11", "22");
-
-                    Log.e("wifi_server", s.get()+"extra");
-                }
-
-                @Override
-                public void onFailure(int reason) {
-                    Log.e("wifi_discover","Connection Failed");
-                }
-            });
-        }
+            @Override
+            public void onFailure(int reason) {
+                Log.e("wifi_discover","Connection Failed");
+            }
+        });
     }
 }
+

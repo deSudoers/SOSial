@@ -40,8 +40,9 @@ public class Client {
         @Override
         protected String doInBackground(String... params){
             InetAddress targetIP = null;
+            String message = "finally";
             try {
-                targetIP = InetAddress.getByName("192.168.49.20");
+                targetIP = InetAddress.getByName("192.168.49.1");
             }
             catch (Exception e){
                 Log.e("wifi_ip", e.toString());
@@ -58,10 +59,9 @@ public class Client {
                     output.writeObject(send);
                     InputStream in = sock.getInputStream();
                     ObjectInputStream input = new ObjectInputStream(in);
-                    String message = (String) input.readObject();
+                    message = (String) input.readObject();
                     out.close();
                     output.close();
-                    return message;
                 }
             }
             catch (Exception e){
@@ -74,7 +74,7 @@ public class Client {
                 catch (Exception e){
                     Log.e("wifi_client_finally", e.toString());
                 }
-                return "finally";
+                return message;
             }
         }
     }

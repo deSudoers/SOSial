@@ -100,7 +100,7 @@ public class TriggerChecker extends Service {
                             //Toast.makeText(getActivity(), "method found",
                             //       Toast.LENGTH_SHORT).show();
                         } catch (Exception e) {
-                            Log.e("wifi_discover", e.toString());
+//                            Log.e("wifi_discover", e.toString());
                             //Toast.makeText(getActivity(), "method did not found",
                             //   Toast.LENGTH_SHORT).show();
                         }

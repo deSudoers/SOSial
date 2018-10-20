@@ -53,7 +53,7 @@ public class Server {
                     socket = sock.accept();
                     InputStream in = socket.getInputStream();
 
-                    ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+                    ObjectInputStream ois = new ObjectInputStream(in);
                     //convert ObjectInputStream object to String
                     String message = (String) ois.readObject();
                     //create ObjectOutputStream object
