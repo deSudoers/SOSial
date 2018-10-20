@@ -236,4 +236,21 @@ public class MessagingActivity extends AppCompatActivity {
         sp2.edit().putString("allmymessages"+count,mssg.toString()).apply();
         sp2.edit().putInt("allmymessagescount", count++).apply();
     }
+
+    public void addMessagetoDatabase(String allmsgs){
+        String msgs[] = allmsgs.split("##");
+        for(String msg: msgs){
+            try{
+                JSONObject json = new JSONObject(msg);
+                String myid = json.getString("sender");
+                String receiver = json.getString("receiver");
+                String mssg = json.getString("message");
+                String key = json.getString("key");
+                addMessagetoDatabase(myid, receiver, mssg, key);
+            }
+            catch (JSONException e){
+                e.printStackTrace();
+            }
+        }
+    }
 }
