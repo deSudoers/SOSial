@@ -25,6 +25,7 @@ public class TriggerActivity extends AppCompatActivity {
 
     Button triggerButton;
     private SharedPreferences sp;
+    private SharedPreferences mylocation;
 
 
     @Override
@@ -50,8 +51,7 @@ public class TriggerActivity extends AppCompatActivity {
 
     private void initiateTrigger() {
 //        String gpsinfo="location";
-        String test = "Helo World";
-        String response = sendJson(test);
+        String response = sendJson();
 
         JSONObject json = null;
         try {
@@ -68,12 +68,15 @@ public class TriggerActivity extends AppCompatActivity {
         }
     }
 
-    private String sendJson(String test) {
-        String url = "https://sosial.azurewebsites.net/location";
+    private String sendJson() {
+        String url = "https://sosial.azurewebsites.net/trigger";
         String response = "";
         JSONObject postData = new JSONObject();
+        mylocation = getSharedPreferences("login",MODE_PRIVATE);
+
         try{
-            postData.put("location", test);
+            postData.put("latitude",mylocation.getString("latitude",""));
+            postData.put("longitude",mylocation.getString("longitude",""));
             SendRequest sdd =  new SendRequest();
             response  = sdd.execute(url, postData.toString()).get();
         }
@@ -99,7 +102,7 @@ public class TriggerActivity extends AppCompatActivity {
                 httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
                 httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
                 httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
-                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestMethod("PUT");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json");
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.setDoInput(true);
@@ -107,7 +110,8 @@ public class TriggerActivity extends AppCompatActivity {
                 wr.writeBytes(params[1]);
                 wr.flush();
                 wr.close();
-
+                int resp = httpURLConnection.getResponseCode();
+                Log.e("resp1234567",resp+"");
                 String line;
                 BufferedReader br=new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
                 while ((line=br.readLine()) != null) {
