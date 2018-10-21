@@ -209,7 +209,7 @@ public class MessagingActivity extends AppCompatActivity {
         int count = sp2.getInt("allmymessagescount",0);
         for(int i = 0; i < count; ++i){
             try {
-                JSONObject json = new JSONObject(sp2.getString("allmymessages" + count, ""));
+                JSONObject json = new JSONObject(sp2.getString("allmymessages" + i, ""));
                 String k = json.getString("key");
                 if(key.equals(k)){
                     return;
@@ -228,13 +228,12 @@ public class MessagingActivity extends AppCompatActivity {
             mssg.put("name", name);
             mssg.put("message", msssg);
             mssg.put("key", key);
+            sp2.edit().putString("allmymessages"+count,mssg.toString()).apply();
+            sp2.edit().putInt("allmymessagescount", ++count).apply();
         }
         catch (JSONException e){
             e.printStackTrace();
         }
-
-        sp2.edit().putString("allmymessages"+count,mssg.toString()).apply();
-        sp2.edit().putInt("allmymessagescount", ++count).apply();
     }
 
     public void addMessagetoDatabase(String allmsgs){

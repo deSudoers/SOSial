@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity
     private TextView mName;
     private TextView mEmail;
 
-    private SharedPreferences sp;
+    private SharedPreferences sp, splocation;
 
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         sp = getSharedPreferences("login", MODE_PRIVATE);
+        splocation = getSharedPreferences("location", MODE_PRIVATE);
         sp.getString("token", "");
         sp.getString("token2", "");
 
@@ -111,8 +112,8 @@ public class MainActivity extends AppCompatActivity
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                sp.edit().putString("latitude", location.getLatitude() + "").apply();
-                sp.edit().putString("longitude", location.getLongitude() + "").apply();
+                splocation.edit().putString("latitude", location.getLatitude() + "").apply();
+                splocation.edit().putString("longitude", location.getLongitude() + "").apply();
                 serverUpdateLocation();
             }
 
@@ -330,8 +331,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     void serverUpdateLocation(){
-        String lat= sp.getString("latitude", "");
-        String lon= sp.getString("longitude", "");
+        String lat= splocation.getString("latitude", "");
+        String lon= splocation.getString("longitude", "");
         if(!lat.equals("") && !lon.equals("")){
             sendJson(lat+", "+lon);
         }
