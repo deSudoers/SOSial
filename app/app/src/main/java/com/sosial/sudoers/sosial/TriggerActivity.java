@@ -72,7 +72,7 @@ public class TriggerActivity extends AppCompatActivity {
         String url = "https://sosial.azurewebsites.net/trigger";
         String response = "";
         JSONObject postData = new JSONObject();
-        mylocation = getSharedPreferences("login",MODE_PRIVATE);
+        mylocation = getSharedPreferences("location",MODE_PRIVATE);
 
         try{
             postData.put("latitude",mylocation.getString("latitude",""));

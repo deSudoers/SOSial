@@ -7,13 +7,23 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class ViewProfileActivity extends AppCompatActivity {
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+public class ViewProfileActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     SharedPreferences myProfile;
+    SharedPreferences location;
     TextView email,number,name;
     Button viewFamily;
 
@@ -35,9 +45,38 @@ public class ViewProfileActivity extends AppCompatActivity {
             }
         });
 
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.mymap);
+        mapFragment.getMapAsync(this);
+
+
+
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        GoogleMap mMap = googleMap;
+        location = getSharedPreferences("location",MODE_PRIVATE);
+        Marker locationMarker;
+
+        LatLng myLocation = new LatLng(Double.parseDouble(location.getString("latitude","0"))
+                , Double.parseDouble(location.getString("longitude","0")));
+        locationMarker = mMap.addMarker(new MarkerOptions().position(myLocation));
+        if(myLocation.longitude == 0 && myLocation.latitude == 0)
+        {
+            locationMarker.setTitle("Location Unknown");
+        }
+        else {
+            locationMarker.setTitle("My Location");
+        }
+
+        locationMarker.showInfoWindow();
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 10));
+    }
+
 
     private void goToFamilyActivity() {
         Intent i = new Intent(this,MemberActivity.class);

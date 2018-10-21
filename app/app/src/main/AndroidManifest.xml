@@ -23,6 +23,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+        <meta-data  
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -121,5 +127,8 @@
                 android:value="com.sosial.sudoers.sosial.MainActivity" />
         </activity>
     </application>
+    <!--<uses-feature-->
+        <!--android:glEsVersion="0x00020000"-->
+        <!--android:required="true"/>-->
 
 </manifest>
