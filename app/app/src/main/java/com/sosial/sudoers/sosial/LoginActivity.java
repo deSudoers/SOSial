@@ -76,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
         sp.getString("token2", "");
 
         if(sp.getBoolean("logged",  false)){
-            sp.edit().putBoolean("logged", false).apply();
             goToMainActivity();
         }
 

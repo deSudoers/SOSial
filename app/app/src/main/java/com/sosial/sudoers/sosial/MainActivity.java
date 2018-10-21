@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity
     private TextView mName;
     private TextView mEmail;
 
-    private SharedPreferences sp, splocation;
+    private SharedPreferences sp, spmessage, splocation;
 
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         sp = getSharedPreferences("login", MODE_PRIVATE);
+        spmessage = getSharedPreferences("allmessages", MODE_PRIVATE);
         splocation = getSharedPreferences("location", MODE_PRIVATE);
         sp.getString("token", "");
         sp.getString("token2", "");
@@ -140,6 +141,17 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+
+        Button mShareLocation = (Button) findViewById(R.id.shareLocation);
+        mShareLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(shareLocation())
+                    Snackbar.make(v, "Location Sent.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                else
+                    Snackbar.make(v, "Failed to send location. Please try again.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
+        });
     }
 
 
@@ -155,12 +167,12 @@ public class MainActivity extends AppCompatActivity
             mEmail.setText(email);
             sp.edit().putInt("myid", json.getInt("user_id")).apply();
             String temp = json.getString("family_email");
-            sp.edit().putString("email", temp.equals("")?temp:temp+",").apply();
+            sp.edit().putString("email", temp+",").apply();
             temp = json.getString("family_name");
-            sp.edit().putString("name", temp.equals("")?temp:temp+",").apply();
+            sp.edit().putString("name", temp+",").apply();
             sp.edit().putString("myname", json.getString("name")).apply();
             temp = json.getString("family_id");
-            sp.edit().putString("userid", temp.equals("")?temp:temp+",").apply();
+            sp.edit().putString("userid", temp+",").apply();
             sp.edit().putString("myemail", json.getString("email")).apply();
             sp.edit().putString("mynumber", json.getString("mobile")).apply();
         }
@@ -274,9 +286,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void goToLoginActivity(){
-        sp.edit().putBoolean("logged", false).apply();
-        sp.edit().putString("token", "").apply();
-        sp.edit().putString("token2", "").apply();
+        sp.edit().clear().apply();
+        spmessage.edit().clear().apply();
+        splocation.edit().clear().apply();
         sendRequest sr = new sendRequest();
         try {
             sr.execute("https://sosial.azurewebsites.net/logout", "").get();
@@ -314,6 +326,58 @@ public class MainActivity extends AppCompatActivity
         }
         else
             locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
+    }
+
+    boolean shareLocation(){
+        updateLocation();
+        String latitude = splocation.getString("latitude", "");
+        String longitude = splocation.getString("longitude", "");
+        if (latitude.equals("") || latitude.equals(""))
+            return false;
+        String myfamilyid[] = sp.getString("userid", "").split(",");
+        String temp = sp.getString("userid", "");
+
+        String myid = sp.getInt("myid", 0) + "";
+        String message = sp.getString("myname", "") + "#" + "This is my location, " + latitude + "," + longitude;
+
+        for (String i: myfamilyid){
+            String key = Password.hashPassword(myid + message + i);
+            addMessagetoDatabase(myid, i, message, key);
+        }
+        return true;
+    }
+
+    public void addMessagetoDatabase(String myid, String receiver, String msg, String key){
+        int count = spmessage.getInt("allmymessagescount",0);
+        for(int i = 0; i < count; ++i){
+            try {
+                JSONObject json = new JSONObject(spmessage.getString("allmymessages" + i, ""));
+                String k = json.getString("key");
+                if(key.equals(k)){
+                    return;
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        JSONObject mssg = new JSONObject();
+        try {
+            mssg.put("sender", myid);
+            mssg.put("receiver", receiver);
+            String name = msg.split("#")[0];
+            String msssg = msg.split("#")[1];
+            if(receiver.equals(sp.getInt("myid", 0)+""))
+                new NotificationSender(this, "", "", name, msssg);
+            mssg.put("name", name);
+            mssg.put("message", msssg);
+            mssg.put("key", key);
+            spmessage.edit().putString("allmymessages"+count,mssg.toString()).apply();
+            spmessage.edit().putInt("allmymessagescount", ++count).apply();
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

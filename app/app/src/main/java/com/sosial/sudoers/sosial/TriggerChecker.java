@@ -103,7 +103,6 @@ public class TriggerChecker extends Service {
                         }
 
                         sp.edit().putBoolean("trigger", true).apply();
-                        new NotificationSender(TriggerChecker.this, "", "", "Alert", "Disaster has Occurred.");
                         if (!trigger_done) {
                             trigger_done = true;
                             try {
@@ -112,7 +111,7 @@ public class TriggerChecker extends Service {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-
+                            new NotificationSender(TriggerChecker.this, "", "", "Alert", "Disaster has Occurred.");
                             receiver = new WifiBroadcastReceiver(mManager, mChannel, TriggerChecker.this);
                             registerReceiver(receiver, intentFilter);
                         }
@@ -276,12 +275,15 @@ public class TriggerChecker extends Service {
                 e.printStackTrace();
             }
         }
+
         JSONObject mssg = new JSONObject();
         try {
             mssg.put("sender", myid);
             mssg.put("receiver", receiver);
             String name = msg.split("#")[0];
             String msssg = msg.split("#")[1];
+            if(receiver.equals(sp.getInt("myid", 0)+""))
+                new NotificationSender(TriggerChecker.this, "", "", name, msssg);
             mssg.put("name", name);
             mssg.put("message", msssg);
             mssg.put("key", key);
