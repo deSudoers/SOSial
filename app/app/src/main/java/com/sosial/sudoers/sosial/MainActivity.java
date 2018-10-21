@@ -33,6 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -110,10 +111,9 @@ public class MainActivity extends AppCompatActivity
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.e("locationupadate", location.getLatitude()+"");
                 sp.edit().putString("latitude", location.getLatitude() + "").apply();
                 sp.edit().putString("longitude", location.getLongitude() + "").apply();
-
+                serverUpdateLocation();
             }
 
             @Override
@@ -273,25 +273,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
-
-    private String sendJson(){
-        String url = "https://sosial.azurewebsites.net/logout";
-        String response = "";
-        try{
-//            response  = sdd.execute(url).get();
-        }
-//        catch (JSONException e){
-//            e.printStackTrace();
-//        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        finally {
-            return response;
-        }
-    }
-
     public void goToLoginActivity(){
         sp.edit().putBoolean("logged", false).apply();
         sp.edit().putString("token", "").apply();
@@ -337,9 +318,87 @@ public class MainActivity extends AppCompatActivity
                     locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
                 }
                 catch (SecurityException e){
-                    Log.e("locationupate", e.toString());
                     e.printStackTrace();
                 }
         }
     }
+
+    void serverUpdateLocation(){
+        String lat= sp.getString("latitude", "");
+        String lon= sp.getString("longitude", "");
+        if(!lat.equals("") && !lon.equals("")){
+            sendJson(lat+", "+lon);
+        }
+    }
+
+    private String sendJson(String location){
+        String url = "https://sosial.azurewebsites.net/location";
+        String response = "";
+        JSONObject postData = new JSONObject();
+        try{
+            postData.put("location", location);
+            sendLocation sl =  new sendLocation();
+            response  = sl.execute(url, postData.toString()).get();
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            return response;
+        }
+    }
+
+    class sendLocation extends AsyncTask<String, Void, String>{
+        @Override
+        protected String doInBackground(String... params) {
+
+            String data = "";
+
+            HttpURLConnection httpURLConnection = null;
+            try {
+                httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token2",""));
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json");
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setDoInput(true);
+                DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
+                wr.writeBytes(params[1]);
+                wr.flush();
+                wr.close();
+
+                int response = httpURLConnection.getResponseCode();
+                if(response == httpURLConnection.HTTP_OK){
+                    String line;
+                    BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+                    while ((line = br.readLine()) != null){
+                        data += line;
+                    }
+                }
+                else{
+                    data = "An Error Occurred. Please Try Again.";
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
+        }
+    }
+
 }
