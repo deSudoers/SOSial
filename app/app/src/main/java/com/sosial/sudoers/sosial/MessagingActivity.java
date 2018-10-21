@@ -142,11 +142,11 @@ public class MessagingActivity extends AppCompatActivity {
         JSONObject postData = new JSONObject();
         try{
             JSONObject postDatai = new JSONObject();
-            String myid = sp.getString("myid", "");
+            String myid = getString(sp.getInt("myid", 0));
             postDatai.put("sender_id", myid);
             postDatai.put("receiver_id", id);
             postDatai.put("message", msg);
-            String key = Password.hashPassword(sp.getString("myid", "")+msg+id);
+            String key = Password.hashPassword(sp.getInt("myid", 0)+msg+id);
             postDatai.put("unique_key", key);
             postData.put("0", postDatai);
 
@@ -234,7 +234,7 @@ public class MessagingActivity extends AppCompatActivity {
         }
 
         sp2.edit().putString("allmymessages"+count,mssg.toString()).apply();
-        sp2.edit().putInt("allmymessagescount", count++).apply();
+        sp2.edit().putInt("allmymessagescount", ++count).apply();
     }
 
     public void addMessagetoDatabase(String allmsgs){
@@ -256,7 +256,8 @@ public class MessagingActivity extends AppCompatActivity {
 
     public void addUsers(String allusers){
         String users[] = allusers.split(",");
-        String already[] = sp.getString("allmyusers", sp.getString("myid", "")+",").split(",");
+        String allmyusers = sp2.getString("allmyusers", sp.getInt("myid", 0)+",");
+        String already[] = allmyusers.split(",");
         for(String usr: users){
             int flag = 0;
             for(String alr: already){
@@ -266,7 +267,8 @@ public class MessagingActivity extends AppCompatActivity {
                 }
             }
             if(flag == 0){
-                sp.edit().putString("allmyusers", sp.getString("allmyusers", sp.getString("myid", ""))+usr+",").apply();
+                allmyusers = sp2.getString("allmyusers", sp.getInt("myid", 0)+",");
+                sp2.edit().putString("allmyusers", allmyusers+usr+",").apply();
             }
         }
     }

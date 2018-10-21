@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity
             mName.setText(name);
             email = json.getString("email");
             mEmail.setText(email);
-            sp.edit().putString("myid", json.getString("user_id")).apply();
+            sp.edit().putInt("myid", json.getInt("user_id")).apply();
             String temp = json.getString("family_email");
             sp.edit().putString("email", temp.equals("")?temp:temp+",").apply();
             temp = json.getString("family_name");

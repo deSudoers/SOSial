@@ -17,11 +17,9 @@ import java.net.Socket;
 
 public class Client {
     private int port = 8080;
-    private WifiP2pInfo info;
     String ids, msgs;
 
-    Client(WifiP2pInfo info, String ids, String msgs){
-        this.info = info;
+    Client(String ids, String msgs){
         this.ids = ids;
         this.msgs = msgs;
     }
@@ -55,7 +53,7 @@ public class Client {
                 if (sock.isConnected()) {
                     OutputStream out = sock.getOutputStream();
                     ObjectOutputStream output = new ObjectOutputStream(out);
-                    String send = "{ids:{"+ids+"}, messages:{"+msgs+"}}\n";
+                    String send = ids+" ### "+msgs;
                     output.writeObject(send);
                     InputStream in = sock.getInputStream();
                     ObjectInputStream input = new ObjectInputStream(in);
