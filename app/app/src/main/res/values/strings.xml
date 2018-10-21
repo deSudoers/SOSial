@@ -42,7 +42,7 @@
     <string name="sign_up">Sign Up</string>
     <string name="sosial">SOSial</string>
     <string name="family">Family</string>
-    <string name="share_location">Share Location</string>
+    <string name="shared_locations">Shared Locations</string>
     <string name="logout">Logout</string>
     <string name="profile">Profile</string>
     <string name="account">Account</string>
@@ -52,5 +52,6 @@
     <string name="profile_number_title">Mobile Number</string>
     <string name="members_list">Members List</string>
     <string name="add_members_title">Add Member</string>
+    <string name="title_activity_shared_locations">SharedLocations</string>
 
 </resources>

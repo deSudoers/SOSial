@@ -13,9 +13,9 @@
             android:icon="@drawable/ic_family"
             android:title="@string/family" />
         <item
-            android:id="@+id/nav_share_location"
-            android:icon="@drawable/ic_menu_share"
-            android:title="@string/share_location" />
+            android:id="@+id/nav_shared_locations"
+            android:icon="@mipmap/ic_shared_location_marker"
+            android:title="@string/shared_locations" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"

@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission
         android:name="android.permission.CHANGE_WIFI_STATE"
         android:required="true" />
@@ -15,6 +15,9 @@
         android:name="android.permission.ACCESS_COARSE_LOCATION"
         android:required="true" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <!-- <uses-feature -->
+    <!-- android:glEsVersion="0x00020000" -->
+    <!-- android:required="true"/> -->
 
     <application
         android:allowBackup="true"
@@ -26,9 +29,10 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-        <meta-data  
+        <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -126,9 +130,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sosial.sudoers.sosial.MainActivity" />
         </activity>
+        <activity
+            android:name=".SharedLocations"
+            android:label="@string/title_activity_shared_locations"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
-    <!--<uses-feature-->
-        <!--android:glEsVersion="0x00020000"-->
-        <!--android:required="true"/>-->
 
 </manifest>

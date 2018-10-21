@@ -269,7 +269,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_inbox) {
             goToInbox();
 
-        } else if (id == R.id.nav_share_location) {
+        } else if (id == R.id.nav_shared_locations) {
+            viewSharedLocations();
 
         } else if (id == R.id.nav_manage) {
 
@@ -283,6 +284,11 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void viewSharedLocations() {
+        Intent i = new Intent(this,SharedLocations.class);
+        startActivity(i);
     }
 
     public void goToLoginActivity(){
