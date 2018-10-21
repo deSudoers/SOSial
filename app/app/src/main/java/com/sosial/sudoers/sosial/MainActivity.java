@@ -265,7 +265,6 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
             goToLoginActivity();
-            sp.edit().putBoolean("logged", false).apply();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -277,6 +276,13 @@ public class MainActivity extends AppCompatActivity
         sp.edit().putBoolean("logged", false).apply();
         sp.edit().putString("token", "").apply();
         sp.edit().putString("token2", "").apply();
+        sendRequest sr = new sendRequest();
+        try {
+            sr.execute("https://sosial.azurewebsites.net/logout", "").get();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
         Intent i = new Intent(this, LoginActivity.class);
         startActivity(i);
     }
@@ -337,7 +343,7 @@ public class MainActivity extends AppCompatActivity
         JSONObject postData = new JSONObject();
         try{
             postData.put("location", location);
-            sendLocation sl =  new sendLocation();
+            sendRequest sl =  new sendRequest();
             response  = sl.execute(url, postData.toString()).get();
         }
         catch (JSONException e){
@@ -351,7 +357,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    class sendLocation extends AsyncTask<String, Void, String>{
+    class sendRequest extends AsyncTask<String, Void, String>{
         @Override
         protected String doInBackground(String... params) {
 
@@ -400,5 +406,4 @@ public class MainActivity extends AppCompatActivity
             Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
         }
     }
-
 }
