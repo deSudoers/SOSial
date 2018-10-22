@@ -57,16 +57,15 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
-                Intent m = new Intent(MainActivity.this, MessagingActivity.class);
-                startActivity(m);
-            }
-        });
+//
+//            }
+//        });
 
         sp = getSharedPreferences("login", MODE_PRIVATE);
         spmessage = getSharedPreferences("allmessages", MODE_PRIVATE);
@@ -98,6 +97,15 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e){
             e.printStackTrace();
         }
+
+        Button sendMessage = (Button) findViewById(R.id.messageButton);
+        sendMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent m = new Intent(MainActivity.this, MessagingActivity.class);
+                startActivity(m);
+            }
+        });
 
         Button openTrigger = (Button) findViewById(R.id.opentrigger);
         openTrigger.setOnClickListener(new View.OnClickListener() {
