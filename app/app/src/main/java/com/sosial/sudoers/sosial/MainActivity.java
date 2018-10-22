@@ -223,7 +223,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -233,6 +232,7 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
         locationManager.removeUpdates(locationListener);
+        this.finishAffinity();
     }
 
 //    @Override
@@ -416,9 +416,6 @@ public class MainActivity extends AppCompatActivity
             postData.put("location", location);
             sendRequest sl =  new sendRequest();
             response  = sl.execute(url, postData.toString()).get();
-        }
-        catch (JSONException e){
-            e.printStackTrace();
         }
         catch (Exception e){
             e.printStackTrace();
