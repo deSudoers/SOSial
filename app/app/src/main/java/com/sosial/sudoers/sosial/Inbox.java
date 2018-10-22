@@ -84,9 +84,9 @@ public class Inbox extends AppCompatActivity {
         String senderName;
         String message;
         int i;
-//        msgJsonStr[0]="{\"sender\":\"2345\",\"receiver\":\"25\",\"name\":\"Shivesh\",\"message\":\"This is my location, 13.366999,74.706136\",\"key\":\"ijnyhbrf\"}";
-//        msgJsonStr[1]="{\"sender\":\"9572\",\"receiver\":\"25\",\"name\":\"Shrijit\",\"message\":\"This is my location, 13.427133, 74.856039\",\"key\":\"9hdb823t\"}";
-//        msgJsonStr[2]="{\"sender\":\"2149\",\"receiver\":\"25\",\"name\":\"Sarath\",\"message\":\"This is my location, 13.225963, 74.737544\",\"key\":\"9hdb823t\"}";
+//        msgJsonStr[0]="{\"sender\":\"2345\",\"receiver\":\"30\",\"name\":\"Shivesh\",\"message\":\"This is my location, 13.366999,74.706136\",\"key\":\"ijnyhbrf\"}";
+//        msgJsonStr[1]="{\"sender\":\"9572\",\"receiver\":\"30\",\"name\":\"Shrijit\",\"message\":\"This is my location, 13.427133, 74.856039\",\"key\":\"9hdb823t\"}";
+//        msgJsonStr[2]="{\"sender\":\"2149\",\"receiver\":\"30\",\"name\":\"Sarath\",\"message\":\"This is my location, 13.225963, 74.737544\",\"key\":\"9hdb823t\"}";
         for (i = 0; i < numOfMsgs; i++)
         {
             try
