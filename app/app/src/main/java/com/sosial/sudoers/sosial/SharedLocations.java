@@ -72,22 +72,29 @@ public class SharedLocations extends AppCompatActivity implements OnMapReadyCall
         String receiverId;
         String senderName;
         int i;
-        for (i = 0; i < 1; i++)
+        //msgJsonStr[0]="{\"sender\":\"2345\",\"receiver\":\"25\",\"name\":\"Shivesh\",\"message\":\"This is my location, 13.366999,74.706136\",\"key\":\"ijnyhbrf\"}";
+        //msgJsonStr[1]="{\"sender\":\"9572\",\"receiver\":\"25\",\"name\":\"Shrijit\",\"message\":\"This is my location, 13.427133, 74.856039\",\"key\":\"9hdb823t\"}";
+        //msgJsonStr[2]="{\"sender\":\"2149\",\"receiver\":\"25\",\"name\":\"Sarath\",\"message\":\"This is my location, 13.225963, 74.737544\",\"key\":\"9hdb823t\"}";
+        for (i = 0; i < numOfMsgs; i++)
         {
             try
             {
                 msgJsonKey = "allmymessages" + i;
                 msgJsonStr = allmessages.getString(msgJsonKey,"");
+
                 msgJson = new JSONObject(msgJsonStr);
 
-                receiverId = msgJson.getString("receiver");setTitle("hello");
+                receiverId = msgJson.getString("receiver");
 
                 if(receiverId.equals(String.valueOf(currentUser.getInt("myid",0))))
                 {
                     senderName = msgJson.getString("name");
+                    String message = msgJson.getString("message");
+                    String latlng = message.substring(21);
+                    String location[] = latlng.split(",");
                     memberLocation = new LatLng(
-                            Double.parseDouble(location.getString("latitude", "0"))
-                        ,Double.parseDouble(location.getString("longitude", "0")));
+                            Double.parseDouble(location[0])
+                        ,Double.parseDouble(location[1]));
                     locationMarker = mMap.addMarker(new MarkerOptions().position(memberLocation));
                     locationMarker.setTitle(senderName);
                 }

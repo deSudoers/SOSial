@@ -77,13 +77,16 @@ public class Inbox extends AppCompatActivity {
     private void renderMessages() {
         numOfMsgs = allmessages.getInt("allmymessagescount",0);
 
-        String msgJsonStr = new String();
-        String msgJsonKey = new String();
+        String msgJsonStr;
+        String msgJsonKey;
         JSONObject msgJson;
         String receiverId;
         String senderName;
         String message;
         int i;
+//        msgJsonStr[0]="{\"sender\":\"2345\",\"receiver\":\"25\",\"name\":\"Shivesh\",\"message\":\"This is my location, 13.366999,74.706136\",\"key\":\"ijnyhbrf\"}";
+//        msgJsonStr[1]="{\"sender\":\"9572\",\"receiver\":\"25\",\"name\":\"Shrijit\",\"message\":\"This is my location, 13.427133, 74.856039\",\"key\":\"9hdb823t\"}";
+//        msgJsonStr[2]="{\"sender\":\"2149\",\"receiver\":\"25\",\"name\":\"Sarath\",\"message\":\"This is my location, 13.225963, 74.737544\",\"key\":\"9hdb823t\"}";
         for (i = 0; i < numOfMsgs; i++)
         {
             try
@@ -92,8 +95,7 @@ public class Inbox extends AppCompatActivity {
                 msgJsonStr = allmessages.getString(msgJsonKey,"");
                 msgJson = new JSONObject(msgJsonStr);
 
-                receiverId = msgJson.getString("receiver");setTitle("hello");
-                setTitle("hello23");
+                receiverId = msgJson.getString("receiver");
 
                 if(receiverId.equals(String.valueOf(currentUser.getInt("myid",0))))
                 {
