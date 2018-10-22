@@ -45,26 +45,13 @@ public class TriggerChecker extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-
-        // Indicates a change in the list of available peers.
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-
-        // Indicates the state of Wi-Fi P2P connectivity has changed.
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-
-        // Indicates this device's details have changed.
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-
-        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
         wifiManager = (WifiManager)TriggerChecker.this.getSystemService(Context.WIFI_SERVICE);
-        stoptimertask();
+        startTimer();
         return START_STICKY;
     }
     @Override
     public void onDestroy() {
-        startTimer();
+        stoptimertask();
 //        super.onDestroy();
 //        stoptimertask();
 //        Log.e("destroyed", "yes");
@@ -112,19 +99,11 @@ public class TriggerChecker extends Service {
                                 e.printStackTrace();
                             }
                             new NotificationSender(TriggerChecker.this, "", "", "Alert", "Disaster has Occurred.");
-                            receiver = new WifiBroadcastReceiver(mManager, mChannel, TriggerChecker.this);
-                            registerReceiver(receiver, intentFilter);
+                            receiver = new WifiBroadcastReceiver(TriggerChecker.this);
+//                            registerReceiver(receiver, intentFilter);
+//                            receiver.startTimer();
                         }
-                        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
 
-                            @Override
-                            public void onSuccess() {
-                            }
-
-                            @Override
-                            public void onFailure(int reasonCode) {
-                            }
-                        });
                     } else {
                         if (iTurnedOn) {
                             wifiManager.setWifiEnabled(false);
@@ -132,7 +111,8 @@ public class TriggerChecker extends Service {
                         }
                         trigger_done = false;
                         try {
-                            unregisterReceiver(receiver);
+//                            unregisterReceiver(receiver);
+                            receiver.stoptimertask();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

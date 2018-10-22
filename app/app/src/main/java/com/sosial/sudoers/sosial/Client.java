@@ -1,22 +1,18 @@
 package com.sosial.sudoers.sosial;
 
-import android.net.wifi.p2p.WifiP2pInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public class Client {
-    private int port = 8080;
+    private int port = 5678;
     String ids, msgs;
 
     Client(String ids, String msgs){
@@ -43,17 +39,16 @@ public class Client {
                 targetIP = InetAddress.getByName("192.168.49.1");
             }
             catch (Exception e){
-                Log.e("wifi_ip", e.toString());
+                e.printStackTrace();
             }
             Socket sock = null;
-            OutputStream os = null;
             try {
                 sock = new Socket();
                 sock.connect(new InetSocketAddress(targetIP, port), 10000);
                 if (sock.isConnected()) {
                     OutputStream out = sock.getOutputStream();
                     ObjectOutputStream output = new ObjectOutputStream(out);
-                    String send = ids+" ### "+msgs;
+                    String send = ids+"###"+msgs;
                     output.writeObject(send);
                     InputStream in = sock.getInputStream();
                     ObjectInputStream input = new ObjectInputStream(in);

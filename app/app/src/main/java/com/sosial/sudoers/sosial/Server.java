@@ -1,23 +1,16 @@
 package com.sosial.sudoers.sosial;
 
-import android.net.wifi.p2p.WifiP2pInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-    private int port = 8080;
+    private int port = 5678;
     String ids, msgs;
 
     Server(String ids, String msgs){
@@ -40,7 +33,7 @@ public class Server {
         protected String doInBackground(String... params){
             ServerSocket sock = null;
             Socket socket = null;
-            OutputStream os = null;
+            String message = "finally";
             try{
                 sock = new ServerSocket(port);
                 sock.setSoTimeout(20000);
@@ -54,28 +47,23 @@ public class Server {
                 InputStream in = socket.getInputStream();
 
                 ObjectInputStream ois = new ObjectInputStream(in);
-                //convert ObjectInputStream object to String
-                String message = (String) ois.readObject();
-                //create ObjectOutputStream object
+                message = (String) ois.readObject();
                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                //write object to Socket
-                String send = ids+" ### "+ msgs;
+                String send = ids+"###"+ msgs;
                 oos.writeObject(send);
-                //close resources
                 ois.close();
                 oos.close();
                 socket.close();
                 Log.e("wifi_server", "outside_try");
-                return message;
             } catch (Exception e) {
                 Log.e("wifi_server_catch", e.toString());
-                return "In catch";
             } finally {
                 try {
                     sock.close();
                 } catch (Exception e) {
                     Log.e("wifi_server_finally", e.toString());
                 }
+                return message;
             }
         }
     }

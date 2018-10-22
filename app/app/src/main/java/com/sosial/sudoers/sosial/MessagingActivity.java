@@ -142,21 +142,16 @@ public class MessagingActivity extends AppCompatActivity {
         JSONObject postData = new JSONObject();
         try{
             JSONObject postDatai = new JSONObject();
-            String myid = getString(sp.getInt("myid", 0));
+            String myid = sp.getInt("myid", 0)+"";
             postDatai.put("sender_id", myid);
             postDatai.put("receiver_id", id);
             postDatai.put("message", msg);
-            String key = Password.hashPassword(sp.getInt("myid", 0)+msg+id);
+            String key = myid+id+msg.substring(0,min(10, msg.length()))+msg.length();
             postDatai.put("unique_key", key);
             postData.put("0", postDatai);
-
-            addMessagetoDatabase(myid, id, msg, key);
-
+            addMessagetoDatabase(myid, sp.getString("myname", ""), id, msg, key);
             SendRequest sdd =  new SendRequest();
             response  = sdd.execute(url, postData.toString()).get();
-        }
-        catch (JSONException e){
-            e.printStackTrace();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -202,6 +197,35 @@ public class MessagingActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
+        }
+    }
+
+    public void addMessagetoDatabase(String myid, String name, String receiver, String msg, String key){
+        int count = sp2.getInt("allmymessagescount",0);
+        for(int i = 0; i < count; ++i){
+            try {
+                JSONObject json = new JSONObject(sp2.getString("allmymessages" + i, ""));
+                String k = json.getString("key");
+                if(key.equals(k)){
+                    return;
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        JSONObject mssg = new JSONObject();
+        try {
+            mssg.put("sender", myid);
+            mssg.put("receiver", receiver);
+            mssg.put("name", name);
+            mssg.put("message", msg);
+            mssg.put("key", key);
+            sp2.edit().putString("allmymessages"+count,mssg.toString()).apply();
+            sp2.edit().putInt("allmymessagescount", ++count).apply();
+        }
+        catch (JSONException e){
+            e.printStackTrace();
         }
     }
 
@@ -270,5 +294,9 @@ public class MessagingActivity extends AppCompatActivity {
                 sp2.edit().putString("allmyusers", allmyusers+usr+",").apply();
             }
         }
+    }
+
+    int min(int x, int y){
+        return x<y ? x: y;
     }
 }
