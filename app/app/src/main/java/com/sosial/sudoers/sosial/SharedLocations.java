@@ -66,7 +66,6 @@ public class SharedLocations extends AppCompatActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         numOfMsgs = allmessages.getInt("allmymessagescount",0);
-        numOfMsgs=3;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         Marker locationMarker[] = new Marker[numOfMsgs+1];
         String msgJsonStr;
