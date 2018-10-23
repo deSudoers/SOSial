@@ -161,6 +161,7 @@ public class MainActivity extends AppCompatActivity
         mShareLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                updateLocation();
                 if(shareLocation())
                     Snackbar.make(v, "Location Sent.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 else
@@ -370,7 +371,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     boolean shareLocation(){
-        updateLocation();
         String latitude = splocation.getString("latitude", "");
         String longitude = splocation.getString("longitude", "");
         if (latitude.equals("") || latitude.equals(""))
@@ -380,9 +380,8 @@ public class MainActivity extends AppCompatActivity
 
         String myid = sp.getInt("myid", 0) + "";
         String message = sp.getString("myname", "") + "#" + "This is my location, " + latitude + "," + longitude;
-
         for (String i: myfamilyid){
-            String key = Password.hashPassword(myid + message + i);
+            String key = myid+i+message.substring(0,min(10, message.length()))+message.length();
             addMessagetoDatabase(myid, i, message, key);
         }
         return true;
@@ -508,5 +507,9 @@ public class MainActivity extends AppCompatActivity
             super.onPostExecute(result);
             Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
         }
+    }
+
+    public int min(int x, int y){
+        return x<y?x:y;
     }
 }
