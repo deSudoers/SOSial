@@ -9,6 +9,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -93,7 +95,11 @@ public class MainActivity extends AppCompatActivity
         String url = "https://sosial.azurewebsites.net/profile";
         GetProfile gp = new GetProfile();
         try {
-            updateProfile(gp.execute(url).get());
+            String response = gp.execute(url).get();
+            if(response.equals(""))
+                updateProfile();
+            else
+                updateProfile(response);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -154,6 +160,10 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    public void updateProfile(){
+        mName.setText(sp.getString("myname", "Unexpectedly logged out."));
+        mEmail.setText(sp.getString("myemail", "Please Log in Again."));
+    }
 
     public void updateProfile(String profile){
         String name = "";
@@ -292,6 +302,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void goToLoginActivity(){
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        if(!isConnected){
+            Snackbar.make(getWindow().getDecorView().getRootView(), "Please connect to Internet to Log Out.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            return;
+        }
+
         sp.edit().clear().apply();
         spmessage.edit().clear().apply();
         splocation.edit().clear().apply();
