@@ -22,6 +22,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.ExecutionException;
+
 public class SharedLocations extends AppCompatActivity implements OnMapReadyCallback {
 
     private SharedPreferences location;
@@ -63,8 +65,6 @@ public class SharedLocations extends AppCompatActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        //13.366999, 74.706136    //13.322447, 74.861606
-
         numOfMsgs = allmessages.getInt("allmymessagescount",0);
         numOfMsgs=3;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -93,19 +93,26 @@ public class SharedLocations extends AppCompatActivity implements OnMapReadyCall
                 {
                     senderName = msgJson.getString("name");
                     String message = msgJson.getString("message");
-                    String latlng = message.substring(21);
-                    String location[] = latlng.split(",");
-                    memberLocation = new LatLng(
-                            Double.parseDouble(location[0])
-                        ,Double.parseDouble(location[1]));
-                    locationMarker[i] = mMap.addMarker(new MarkerOptions().position(memberLocation));
-                    locationMarker[i].setTitle(senderName);
+                    if(message.startsWith("This is my location,")) {
+                        String latlng = message.substring(21);
+                        String location[] = latlng.split(",");
+                        memberLocation = new LatLng(
+                                Double.parseDouble(location[0])
+                                , Double.parseDouble(location[1]));
+                        locationMarker[i] = mMap.addMarker(new MarkerOptions().position(memberLocation));
+                        locationMarker[i].setTitle(senderName);
+                    }
                 }
             }
             catch(JSONException e)
             {
                 e.printStackTrace();
             }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+
         }
 
 
