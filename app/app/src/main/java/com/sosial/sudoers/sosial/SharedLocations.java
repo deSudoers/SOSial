@@ -122,6 +122,8 @@ public class SharedLocations extends AppCompatActivity implements OnMapReadyCall
         locationMarker[i].showInfoWindow();
 //        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(memberLocation, 10));
         for (Marker marker : locationMarker) {
+            if(marker == null)
+                continue;
             builder.include(marker.getPosition());
         }
         LatLngBounds bounds = builder.build();
