@@ -24,14 +24,9 @@ import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class TriggerChecker extends Service {
-    private boolean trigger_done, iTurnedOn;
-    private SharedPreferences sp, splocation, spmessages;
-    private final IntentFilter intentFilter = new IntentFilter();
-    WifiBroadcastReceiver receiver;
-    WifiP2pManager.Channel mChannel;
-    WifiP2pManager mManager;
-    WifiManager wifiManager;
     Context cxt;
 
     public TriggerChecker(Context applicationContext) {
@@ -39,19 +34,23 @@ public class TriggerChecker extends Service {
         cxt = applicationContext;
     }
 
-    public TriggerChecker(){
+    public TriggerChecker() {
 
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        wifiManager = (WifiManager)TriggerChecker.this.getSystemService(Context.WIFI_SERVICE);
-        startTimer();
+//        startTimer();
+        checker c = new checker(this);
+        Thread t = new Thread(c);
+        t.start();
         return START_STICKY;
     }
+
     @Override
     public void onDestroy() {
-        stoptimertask();
+//        stoptimertask();
 //        super.onDestroy();
 //        stoptimertask();
 //        Log.e("destroyed", "yes");
@@ -59,19 +58,41 @@ public class TriggerChecker extends Service {
 //        sendBroadcast(broadcastIntent);
     }
 
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+}
+
+class checker implements Runnable{
+    WifiManager wifiManager;
+    private boolean trigger_done, iTurnedOn;
+    private SharedPreferences sp, splocation, spmessages;
+    private final IntentFilter intentFilter = new IntentFilter();
+    WifiBroadcastReceiver receiver;
+    WifiP2pManager.Channel mChannel;
+    WifiP2pManager mManager;
     private Timer timer;
     private TimerTask timerTask;
+    private Context cxt;
 
-    public void startTimer() {
+    checker(Context cxt){
+        this.cxt = cxt;
+        wifiManager = (WifiManager) cxt.getSystemService(Context.WIFI_SERVICE);
+    }
+
+    public void run() {
         timer = new Timer();
         initializeTimerTask();
         timer.schedule(timerTask, 0, 60000);
     }
 
     public void initializeTimerTask() {
-        sp = getSharedPreferences("login", MODE_PRIVATE);
-        splocation = getSharedPreferences("location", MODE_PRIVATE);
-        spmessages = getSharedPreferences("allmessages", MODE_PRIVATE);
+        sp = cxt.getSharedPreferences("login", MODE_PRIVATE);
+        splocation = cxt.getSharedPreferences("location", MODE_PRIVATE);
+        spmessages = cxt.getSharedPreferences("allmessages", MODE_PRIVATE);
         timerTask = new TimerTask() {
             public void run() {
                 String latitude = splocation.getString("latitude", "");
@@ -98,8 +119,8 @@ public class TriggerChecker extends Service {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            new NotificationSender(TriggerChecker.this, "", "", "Alert", "Disaster has Occurred.");
-                            receiver = new WifiBroadcastReceiver(TriggerChecker.this);
+                            new NotificationSender(cxt, "", "", "Alert", "Disaster has Occurred.");
+                            receiver = new WifiBroadcastReceiver(cxt);
 //                            registerReceiver(receiver, intentFilter);
 //                            receiver.startTimer();
                         }
@@ -129,12 +150,6 @@ public class TriggerChecker extends Service {
         }
     }
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
     public void getMessages(){
         String users[] = spmessages.getString("allmyusers", sp.getInt("myid", 0)+",").split(",");
         String url = "https://sosial.azurewebsites.net/message";
@@ -144,7 +159,7 @@ public class TriggerChecker extends Service {
                 postData.put(i+"", users[i]);
             }
             Query query =  new Query();
-            String response  = query.execute(url, postData.toString(), "POST").get();
+            String response  = query.execute(url, postData.toString(), "POST", sp.getString("token2",""), sp.getString("token","")).get();
             addMessagetoDatabase(response);
         }
         catch (Exception e){
@@ -160,7 +175,7 @@ public class TriggerChecker extends Service {
             postData.put("latitude", latitude);
             postData.put("longitude", longitude);
             Query query =  new Query();
-            response  = query.execute(url, postData.toString(), "POST").get();
+            response  = query.execute(url, postData.toString(), "POST", sp.getString("token2",""), sp.getString("token","")).get();
             try{
                 JSONObject json = new JSONObject(response);
                 response = json.getString("triggered");
@@ -209,7 +224,7 @@ public class TriggerChecker extends Service {
 
         Query query = new Query();
         try{
-            query.execute(url, sendJson.toString(), "PUT");
+            query.execute(url, sendJson.toString(), "PUT", sp.getString("token2",""), sp.getString("token",""));
         }
         catch (Exception e){
             e.printStackTrace();
@@ -263,7 +278,7 @@ public class TriggerChecker extends Service {
             String name = msg.split("#")[0];
             String msssg = msg.split("#")[1];
             if(receiver.equals(sp.getInt("myid", 0)+""))
-                new NotificationSender(TriggerChecker.this, "", "", name, msssg);
+                new NotificationSender(cxt, "", "", name, msssg);
             mssg.put("name", name);
             mssg.put("message", msssg);
             mssg.put("key", key);
@@ -275,7 +290,7 @@ public class TriggerChecker extends Service {
         }
     }
 
-    class Query extends AsyncTask<String, Void, String> {
+    static class Query extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
 
@@ -284,8 +299,8 @@ public class TriggerChecker extends Service {
             HttpURLConnection httpURLConnection = null;
             try {
                 httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
-                httpURLConnection.addRequestProperty("cookie", sp.getString("token2",""));
-                httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
+                httpURLConnection.addRequestProperty("cookie", params[3]);
+                httpURLConnection.addRequestProperty("cookie", params[4]);
                 httpURLConnection.setRequestMethod(params[2]);
                 httpURLConnection.setRequestProperty("Content-Type", "application/json");
                 httpURLConnection.setDoOutput(true);
