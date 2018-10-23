@@ -76,7 +76,6 @@ public class Inbox extends AppCompatActivity {
 
     private void renderMessages() {
         numOfMsgs = allmessages.getInt("allmymessagescount",0);
-
         String msgJsonStr;
         String msgJsonKey;
         JSONObject msgJson;

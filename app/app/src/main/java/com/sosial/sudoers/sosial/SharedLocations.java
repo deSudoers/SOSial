@@ -9,11 +9,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -24,7 +26,6 @@ public class SharedLocations extends AppCompatActivity implements OnMapReadyCall
 
     private SharedPreferences location;
     private SharedPreferences currentUser;
-    private Marker locationMarker;
     private GoogleMap mMap;
     private LatLng memberLocation;
     private SharedPreferences allmessages;
@@ -65,16 +66,18 @@ public class SharedLocations extends AppCompatActivity implements OnMapReadyCall
         //13.366999, 74.706136    //13.322447, 74.861606
 
         numOfMsgs = allmessages.getInt("allmymessagescount",0);
-
+        numOfMsgs=3;
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        Marker locationMarker[] = new Marker[numOfMsgs+1];
         String msgJsonStr;
         String msgJsonKey;
         JSONObject msgJson;
         String receiverId;
         String senderName;
-        int i;
-//        msgJsonStr[0]="{\"sender\":\"2345\",\"receiver\":\"30\",\"name\":\"Shivesh\",\"message\":\"This is my location, 13.366999,74.706136\",\"key\":\"ijnyhbrf\"}";
-//        msgJsonStr[1]="{\"sender\":\"9572\",\"receiver\":\"30\",\"name\":\"Shrijit\",\"message\":\"This is my location, 13.427133, 74.856039\",\"key\":\"9hdb823t\"}";
-//        msgJsonStr[2]="{\"sender\":\"2149\",\"receiver\":\"30\",\"name\":\"Sarath\",\"message\":\"This is my location, 13.225963, 74.737544\",\"key\":\"9hdb823t\"}";
+        int i=0;
+//        msgJsonStr[0]="{\"sender\":\"2345\",\"receiver\":\"40\",\"name\":\"Shivesh\",\"message\":\"This is my location, 13.3669991111111111,74.706136\",\"key\":\"ijnyhbrf\"}";
+//        msgJsonStr[1]="{\"sender\":\"9572\",\"receiver\":\"40\",\"name\":\"Shrijit\",\"message\":\"This is my location, 13.427133, 74.856039\",\"key\":\"9hdb823t\"}";
+//        msgJsonStr[2]="{\"sender\":\"2149\",\"receiver\":\"40\",\"name\":\"Sarath\",\"message\":\"This is my location, 13.225963, 74.737544\",\"key\":\"9hdb823t\"}";
         for (i = 0; i < numOfMsgs; i++)
         {
             try
@@ -95,8 +98,8 @@ public class SharedLocations extends AppCompatActivity implements OnMapReadyCall
                     memberLocation = new LatLng(
                             Double.parseDouble(location[0])
                         ,Double.parseDouble(location[1]));
-                    locationMarker = mMap.addMarker(new MarkerOptions().position(memberLocation));
-                    locationMarker.setTitle(senderName);
+                    locationMarker[i] = mMap.addMarker(new MarkerOptions().position(memberLocation));
+                    locationMarker[i].setTitle(senderName);
                 }
             }
             catch(JSONException e)
@@ -108,10 +111,17 @@ public class SharedLocations extends AppCompatActivity implements OnMapReadyCall
 
         memberLocation = new LatLng(Double.parseDouble(location.getString("latitude","0"))
                 , Double.parseDouble(location.getString("longitude","0")));
-        locationMarker = mMap.addMarker(new MarkerOptions().position(memberLocation));
-        locationMarker.setTitle("My Location");
-        locationMarker.showInfoWindow();
+        locationMarker[i] = mMap.addMarker(new MarkerOptions().position(memberLocation));
+        locationMarker[i].setTitle("My Location");
+        locationMarker[i].showInfoWindow();
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(memberLocation, 10));
+        for (Marker marker : locationMarker) {
+            builder.include(marker.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+        int padding = 100; // offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        googleMap.animateCamera(cu);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(memberLocation, 10));
     }
 }
