@@ -117,8 +117,10 @@ public class MainActivity extends AppCompatActivity
         openTrigger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent t = new Intent(MainActivity.this, TriggerActivity.class);
-                startActivity(t);
+//                Intent t = new Intent(MainActivity.this, TriggerActivity.class);
+//                startActivity(t);
+                initiateTrigger();
+                sp.edit().putBoolean("trigger", true).apply();
             }
         });
 
@@ -511,5 +513,94 @@ public class MainActivity extends AppCompatActivity
 
     public int min(int x, int y){
         return x<y?x:y;
+    }
+
+    private void initiateTrigger() {
+//        String gpsinfo="location";
+        String response = sendJson();
+
+        JSONObject json = null;
+        try {
+            json = new JSONObject(response);
+            response = json.getString("message");
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+        catch (Exception e){
+        }
+        if(response.equals("Location Updated.")){
+            Log.e("CHECK","Works!");
+        }
+    }
+
+    private String sendJson() {
+        String url = "https://sosial.azurewebsites.net/trigger";
+        String response = "";
+        JSONObject postData = new JSONObject();
+        splocation = getSharedPreferences("location",MODE_PRIVATE);
+
+        try{
+            postData.put("latitude",splocation.getString("latitude",""));
+            postData.put("longitude",splocation.getString("longitude",""));
+            SendRequest sdd =  new SendRequest();
+            response  = sdd.execute(url, postData.toString()).get();
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            return response;
+        }
+    }
+
+    class SendRequest extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+
+            String data = "";
+
+            HttpURLConnection httpURLConnection = null;
+            try {
+                httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
+                httpURLConnection.setRequestMethod("PUT");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json");
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setDoInput(true);
+                DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
+                wr.writeBytes(params[1]);
+                wr.flush();
+                wr.close();
+                int resp = httpURLConnection.getResponseCode();
+                Log.e("resp1234567",resp+"");
+                String line;
+                BufferedReader br=new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+                while ((line=br.readLine()) != null) {
+                    data+=line;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("U",e.toString());
+            }
+            finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
+        }
     }
 }

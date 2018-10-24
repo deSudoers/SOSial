@@ -1,6 +1,12 @@
 package com.sosial.sudoers.sosial;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -10,63 +16,130 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-public class Client {
+public class Client extends AsyncTask<String, Void, String> {
     private int port = 5678;
-    String ids, msgs;
+    Context cxt;
+    SharedPreferences sp, spmessages;
 
-    Client(String ids, String msgs){
-        this.ids = ids;
-        this.msgs = msgs;
+    Client(Context cxt){
+        this.cxt = cxt;
+        sp = cxt.getSharedPreferences("login", Context.MODE_PRIVATE);
+        spmessages = cxt.getSharedPreferences("allmessages", Context.MODE_PRIVATE);
     }
-
-    public String get(){
-        try{
-            SendRequest sr = new SendRequest();
-            return  sr.execute().get();
+    @Override
+    protected String doInBackground(String... params){
+        InetAddress targetIP = null;
+        String message = "finally";
+        try {
+            targetIP = InetAddress.getByName("192.168.49.1");
         }
         catch (Exception e){
-            return e.toString();
+            e.printStackTrace();
+        }
+        Socket sock = null;
+        try {
+            sock = new Socket();
+            sock.connect(new InetSocketAddress(targetIP, port), 10000);
+            if (sock.isConnected()) {
+                OutputStream out = sock.getOutputStream();
+                ObjectOutputStream output = new ObjectOutputStream(out);
+                String send = params[0]+"###"+params[1];
+                output.writeObject(send);
+                InputStream in = sock.getInputStream();
+                ObjectInputStream input = new ObjectInputStream(in);
+                message = (String) input.readObject();
+                out.close();
+                output.close();
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                sock.close();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            return message;
         }
     }
 
-    class SendRequest extends AsyncTask<String, Void, String>{
-        @Override
-        protected String doInBackground(String... params){
-            InetAddress targetIP = null;
-            String message = "finally";
+    @Override
+    protected void onPostExecute(String s){
+        if (!s.equals("finally")) {
+            addUsers(s.split("###")[0]);
+            addMessagetoDatabase(s.split("###")[1]);
+        }
+    }
+
+    public void addMessagetoDatabase(String myid, String name, String receiver, String msg, String key){
+        int count = spmessages.getInt("allmymessagescount",0);
+        for(int i = 0; i < count; ++i){
             try {
-                targetIP = InetAddress.getByName("192.168.49.1");
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-            Socket sock = null;
-            try {
-                sock = new Socket();
-                sock.connect(new InetSocketAddress(targetIP, port), 10000);
-                if (sock.isConnected()) {
-                    OutputStream out = sock.getOutputStream();
-                    ObjectOutputStream output = new ObjectOutputStream(out);
-                    String send = ids+"###"+msgs;
-                    output.writeObject(send);
-                    InputStream in = sock.getInputStream();
-                    ObjectInputStream input = new ObjectInputStream(in);
-                    message = (String) input.readObject();
-                    out.close();
-                    output.close();
+                JSONObject json = new JSONObject(spmessages.getString("allmymessages" + i, ""));
+                String k = json.getString("key");
+                if(key.equals(k)){
+                    return;
                 }
             }
             catch (Exception e){
                 e.printStackTrace();
             }
-            finally {
-                try {
-                    sock.close();
+        }
+        JSONObject mssg = new JSONObject();
+        try {
+            mssg.put("sender", myid);
+            mssg.put("receiver", receiver);
+            mssg.put("name", name);
+            mssg.put("message", msg);
+            mssg.put("key", key);
+            if (receiver.equals(sp.getInt("myid", 0) + ""))
+                new NotificationSender(cxt, "", "", name, msg);
+            spmessages.edit().putString("allmymessages"+count,mssg.toString()).apply();
+            spmessages.edit().putInt("allmymessagescount", ++count).apply();
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void addMessagetoDatabase(String allmsgs){
+        String msgs[] = allmsgs.split("##");
+        for(String msg: msgs){
+            try{
+                Log.e("addusersmsg_", msg);
+                JSONObject json = new JSONObject(msg);
+                String myid = json.getString("sender");
+                String receiver = json.getString("receiver");
+                String name = json.getString("name");
+                String mssg = json.getString("message");
+                String key = json.getString("key");
+                addMessagetoDatabase(myid, name, receiver, mssg, key);
+            }
+            catch (JSONException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void addUsers(String allusers){
+        Log.e("addusers", allusers);
+        String users[] = allusers.split(",");
+        String allmyusers = spmessages.getString("allmyusers", sp.getInt("myid", 0)+",");
+        String already[] = allmyusers.split(",");
+        for(String usr: users){
+            int flag = 0;
+            for(String alr: already){
+                if(usr.equals(alr)){
+                    flag = 1;
+                    break;
                 }
-                catch (Exception e){
-                    e.printStackTrace();
-                }
-                return message;
+            }
+            if(flag == 0){
+                allmyusers = spmessages.getString("allmyusers", sp.getInt("myid", 0)+",");
+                spmessages.edit().putString("allmyusers", allmyusers+usr+",").apply();
             }
         }
     }

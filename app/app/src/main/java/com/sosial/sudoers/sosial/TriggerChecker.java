@@ -97,8 +97,8 @@ class checker implements Runnable{
             public void run() {
                 String latitude = splocation.getString("latitude", "");
                 String longitude = splocation.getString("longitude", "");
-                if (!latitude.equals("") && !longitude.equals("")) {
-                    if (sendJson(latitude, longitude).equals("1")) {
+                if ((!latitude.equals("") && !longitude.equals("")) || sp.getBoolean("trigger", false)) {
+                    if (sp.getBoolean("trigger", false) || sendJson(latitude, longitude).equals("1")) {
                         getMessages();
                         sendMessages();
                         try {

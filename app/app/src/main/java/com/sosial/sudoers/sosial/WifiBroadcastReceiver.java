@@ -95,7 +95,7 @@ public class WifiBroadcastReceiver extends Thread{
                 final String mymsg = msg;
                 final String myusers = sp2.getString("allmyusers", sp.getInt("myid", 0) + ",");
 
-                if (count++%1 == 0) {
+                if (count++%5 == 0) {
                     count = 1;
                     try {
                         Runnable runnable = new Runnable() {
@@ -119,13 +119,28 @@ public class WifiBroadcastReceiver extends Thread{
                     }
                 } else {
                     try {
-                        Client c = new Client(myusers, msg);
-                        String get = c.get();
-                        Log.e("wifi_message_client", get);
-                        if(!get.equals("finally")) {
-                            addUsers(get.split("###")[0]);
-                            addMessagetoDatabase(get.split("###")[1]);
+                        try {
+                            Runnable runnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    Client c = new Client(cxt);
+                                    c.execute(myusers, mymsg);
+                                }
+                            };
+                            Thread mythread = new Thread(runnable);
+                            mythread.start();
                         }
+                        catch (Exception e){
+                            e.printStackTrace();
+                        }
+
+//                        Client c = new Client(myusers, msg);
+//                        String get = c.get();
+//                        Log.e("wifi_message_client", get);
+//                        if(!get.equals("finally")) {
+//                            addUsers(get.split("###")[0]);
+//                            addMessagetoDatabase(get.split("###")[1]);
+//                        }
                     } catch (Exception e) {
                         Log.e("wifi_discover_client_e", e.toString());
                     }
@@ -189,13 +204,29 @@ public class WifiBroadcastReceiver extends Thread{
                                     e.printStackTrace();
                                 }
                             } else {
-                                Client c = new Client(myusers, msg);
-                                String get = c.get();
-                                Log.e("wifi_message_client", get);
-                                if (!get.equals("finally")) {
-                                    addUsers(get.split("###")[0]);
-                                    addMessagetoDatabase(get.split("###")[1]);
+                                try {
+                                    Runnable runnable = new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Client c = new Client(cxt);
+                                            c.execute(myusers, mymsg);
+                                        }
+                                    };
+                                    Thread mythread = new Thread(runnable);
+                                    mythread.start();
                                 }
+                                catch (Exception e){
+                                    e.printStackTrace();
+                                }
+
+
+
+//                                String get = c.get();
+//                                Log.e("wifi_message_client", get);
+//                                if (!get.equals("finally")) {
+//                                    addUsers(get.split("###")[0]);
+//                                    addMessagetoDatabase(get.split("###")[1]);
+//                                }
                             }
                         }
                         catch (Exception e){
