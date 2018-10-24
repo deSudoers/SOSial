@@ -54,7 +54,7 @@ public class MessagingActivity extends AppCompatActivity {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                sendMessage();
                 Snackbar.make(view, sp.getString("message_error", "An Error Occurred. Please Try Again."), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -69,7 +69,7 @@ public class MessagingActivity extends AppCompatActivity {
         }
     }
 
-    private void attemptLogin() {
+    private void sendMessage() {
 
         // Store values at the time of the login attempt.
         int selected = mSpinner.getSelectedItemPosition();
@@ -82,8 +82,8 @@ public class MessagingActivity extends AppCompatActivity {
         }
         else
         if(id != "") {
-            sendJson(id, message);
-            sp.edit().putString("message_error", "Sent Successfully").apply();
+            String response = sendJson(id, message);
+            sp.edit().putString("message_error", response).apply();
         }
         else{
             sp.edit().putString("message_error", "An Error Occurred. Please Try Again.").apply();
@@ -119,7 +119,7 @@ public class MessagingActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-            String data = "";
+            String data = "Message Saved for Sharing Over Wifi";
 
             HttpURLConnection httpURLConnection = null;
             try {
@@ -134,6 +134,10 @@ public class MessagingActivity extends AppCompatActivity {
                 wr.writeBytes(params[1]);
                 wr.flush();
                 wr.close();
+
+                int response = httpURLConnection.getResponseCode();
+                if(response == 200)
+                    data = "Message sent to server.";
 
             } catch (Exception e) {
                 e.printStackTrace();

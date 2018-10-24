@@ -54,5 +54,6 @@
     <string name="add_members_title">Add Member</string>
     <string name="title_activity_shared_locations">SharedLocations</string>
     <string name="app_version">Version 0.1.0</string>
+    <string name="end_process">End Processes</string>
 
 </resources>

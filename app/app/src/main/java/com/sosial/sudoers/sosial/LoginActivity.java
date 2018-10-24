@@ -37,11 +37,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private SharedPreferences sp;
     Intent mServiceIntent;
-    private TriggerChecker mTriggerChecker;
     Context ctx;
-    public Context getCtx(){
-        return ctx;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +45,6 @@ public class LoginActivity extends AppCompatActivity {
         ctx = this;
         setContentView(R.layout.activity_login);
         //Remove title bar
-
-        mTriggerChecker = new TriggerChecker(getCtx());
-        mServiceIntent = new Intent(getCtx(), mTriggerChecker.getClass());
-        if (!isMyServiceRunning(mTriggerChecker.getClass())) {
-            startService(mServiceIntent);
-        }
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -101,18 +91,6 @@ public class LoginActivity extends AppCompatActivity {
                 goToRegisterActivity();
             }
         });
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.i ("isMyServiceRunning?", true+"");
-                return true;
-            }
-        }
-        Log.i ("isMyServiceRunning?", false+"");
-        return false;
     }
 
     @Override

@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
-import com.sosial.sudoers.sosial.R;
-
 public class NotificationSender {
     NotificationSender(Context cxt, String bigTitle, String bigDetails, String title, String text){
         NotificationCompat.Builder mBuilder =

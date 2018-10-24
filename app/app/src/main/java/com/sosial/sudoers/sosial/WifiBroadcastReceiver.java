@@ -1,7 +1,6 @@
 package com.sosial.sudoers.sosial;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -34,7 +33,6 @@ public class WifiBroadcastReceiver extends Thread{
         sp = cxt.getSharedPreferences("login", Context.MODE_PRIVATE);
         sp2 = cxt.getSharedPreferences("allmessages", Context.MODE_PRIVATE);
         count = 0;
-        Log.e("wifi_discover", "wifi_broadcaster");
         startTimer();
     }
 
@@ -85,7 +83,7 @@ public class WifiBroadcastReceiver extends Thread{
                         mythread.start();
 
                     } catch (Exception e) {
-                        Log.e("wifi_discover_except", e.toString());
+                        e.printStackTrace();
                     }
                 } else {
                     try {
@@ -105,7 +103,7 @@ public class WifiBroadcastReceiver extends Thread{
                         }
 
                     } catch (Exception e) {
-                        Log.e("wifi_discover_client_e", e.toString());
+                        e.printStackTrace();
                     }
                 }
                 manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {

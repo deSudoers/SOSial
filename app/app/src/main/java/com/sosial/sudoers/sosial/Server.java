@@ -32,7 +32,7 @@ class Server extends AsyncTask<String, Void, String>{
             sock.setSoTimeout(20000);
         }
         catch (Exception e){
-            Log.e("wifi_server", e.toString());
+            e.printStackTrace();
         }
         try {
             Log.e("wifi_server", "inside_try");
@@ -47,14 +47,13 @@ class Server extends AsyncTask<String, Void, String>{
             ois.close();
             oos.close();
             socket.close();
-            Log.e("wifi_server", "outside_try");
         } catch (Exception e) {
-            Log.e("wifi_server_catch", e.toString());
+            e.printStackTrace();
         } finally {
             try {
                 sock.close();
             } catch (Exception e) {
-                Log.e("wifi_server_finally", e.toString());
+                e.printStackTrace();
             }
             return message;
         }

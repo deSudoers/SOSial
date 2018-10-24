@@ -6,4 +6,9 @@
         android:orderInCategory="100"
         android:title="@string/about_popup"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/end_process"
+        android:orderInCategory="100"
+        android:title="@string/end_process"
+        app:showAsAction="never" />
 </menu>

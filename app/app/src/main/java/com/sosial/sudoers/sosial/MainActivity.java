@@ -1,7 +1,7 @@
 package com.sosial.sudoers.sosial;
 
 import android.Manifest;
-import android.app.IntentService;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,7 +15,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -44,7 +43,6 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private TextView mProfileInfo;
     private TextView mName;
     private TextView mEmail;
 
@@ -52,6 +50,14 @@ public class MainActivity extends AppCompatActivity
 
     private LocationManager locationManager;
     private LocationListener locationListener;
+
+
+    Intent mServiceIntent = null;
+    private TriggerChecker mTriggerChecker = null;
+
+    public Context getCtx(){
+        return this;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,23 +65,19 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//
-//            }
-//        });
+        if(mTriggerChecker == null)
+            mTriggerChecker = new TriggerChecker(getCtx());
+        if(mServiceIntent == null)
+            mServiceIntent = new Intent(getCtx(), mTriggerChecker.getClass());
+        if (!isMyServiceRunning(mTriggerChecker.getClass())) {
+            startService(mServiceIntent);
+        }
 
         sp = getSharedPreferences("login", MODE_PRIVATE);
         spmessage = getSharedPreferences("allmessages", MODE_PRIVATE);
         splocation = getSharedPreferences("location", MODE_PRIVATE);
         sp.getString("token", "");
         sp.getString("token2", "");
-
-        mProfileInfo = (TextView) findViewById(R.id.profile);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -117,9 +119,12 @@ public class MainActivity extends AppCompatActivity
         openTrigger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent t = new Intent(MainActivity.this, TriggerActivity.class);
-//                startActivity(t);
+                Snackbar.make(view, "Disaster Event Created. Please Update Location and allow wifi communication.", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                updateLocation();
                 initiateTrigger();
+                if (!isMyServiceRunning(mTriggerChecker.getClass()))
+                    startService(mServiceIntent);
                 sp.edit().putBoolean("trigger", true).apply();
             }
         });
@@ -170,78 +175,11 @@ public class MainActivity extends AppCompatActivity
                     Snackbar.make(v, "Failed to send location. Please try again.", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
-    }
 
-    public void updateProfile(){
-        mName.setText(sp.getString("myname", "Unexpectedly logged out."));
-        mEmail.setText(sp.getString("myemail", "Please Log in Again."));
-    }
-
-    public void updateProfile(String profile){
-        String name = "";
-        String email = "";
-        JSONObject json = null;
-        try{
-            json = new JSONObject(profile);
-            name = json.getString("name");
-            mName.setText(name);
-            email = json.getString("email");
-            mEmail.setText(email);
-            sp.edit().putInt("myid", json.getInt("user_id")).apply();
-            String temp = json.getString("family_email");
-            sp.edit().putString("email", temp+",").apply();
-            temp = json.getString("family_name");
-            sp.edit().putString("name", temp+",").apply();
-            sp.edit().putString("myname", json.getString("name")).apply();
-            temp = json.getString("family_id");
-            sp.edit().putString("userid", temp+",").apply();
-            sp.edit().putString("myemail", json.getString("email")).apply();
-            sp.edit().putString("mynumber", json.getString("mobile")).apply();
-        }
-        catch (JSONException e){
-            e.printStackTrace();
-        }
-        mProfileInfo.setText(profile);
-    }
-
-    class GetProfile extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-
-            String data = "";
-
-            HttpURLConnection httpURLConnection = null;
-            try {
-                httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
-                httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
-                httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.setDoInput(true);
-                InputStream in = httpURLConnection.getInputStream();
-                InputStreamReader inputStreamReader = new InputStreamReader(in);
-
-                int inputStreamData = inputStreamReader.read();
-                while (inputStreamData != -1) {
-                    char current = (char) inputStreamData;
-                    inputStreamData = inputStreamReader.read();
-                    data += current;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            finally {
-                if (httpURLConnection != null) {
-                    httpURLConnection.disconnect();
-                }
-            }
-
-            return data;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
+        if(splocation.getString("latitude", "").equals("") || splocation.getString("longitude", "").equals("")) {
+            updateLocation();
+            Snackbar.make(getWindow().getDecorView().getRootView(), "Please Update Your Location.", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
         }
     }
 
@@ -276,6 +214,13 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.about_popup) {
             Intent i = new Intent(this,PopupActivity.class);
             this.startActivity(i);
+            return true;
+        }
+
+        if (id == R.id.end_process) {
+            stopService(mServiceIntent);
+            sp.edit().putBoolean("trigger", false).apply();
+            TriggerChecker.end();
             return true;
         }
 
@@ -359,7 +304,82 @@ public class MainActivity extends AppCompatActivity
         startActivity(i);
     }
 
+    //Profile
 
+    public void updateProfile(){
+        mName.setText(sp.getString("myname", "Unexpectedly logged out."));
+        mEmail.setText(sp.getString("myemail", "Please Log in Again."));
+    }
+
+    public void updateProfile(String profile){
+        String name = "";
+        String email = "";
+        JSONObject json = null;
+        try{
+            json = new JSONObject(profile);
+            name = json.getString("name");
+            mName.setText(name);
+            email = json.getString("email");
+            mEmail.setText(email);
+            sp.edit().putInt("myid", json.getInt("user_id")).apply();
+            String temp = json.getString("family_email");
+            sp.edit().putString("email", temp+",").apply();
+            temp = json.getString("family_name");
+            sp.edit().putString("name", temp+",").apply();
+            sp.edit().putString("myname", json.getString("name")).apply();
+            temp = json.getString("family_id");
+            sp.edit().putString("userid", temp+",").apply();
+            sp.edit().putString("myemail", json.getString("email")).apply();
+            sp.edit().putString("mynumber", json.getString("mobile")).apply();
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
+    class GetProfile extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+
+            String data = "";
+
+            HttpURLConnection httpURLConnection = null;
+            try {
+                httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
+                httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
+                httpURLConnection.setRequestMethod("GET");
+                httpURLConnection.setDoInput(true);
+                InputStream in = httpURLConnection.getInputStream();
+                InputStreamReader inputStreamReader = new InputStreamReader(in);
+
+                int inputStreamData = inputStreamReader.read();
+                while (inputStreamData != -1) {
+                    char current = (char) inputStreamData;
+                    inputStreamData = inputStreamReader.read();
+                    data += current;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+            }
+
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
+        }
+    }
+
+
+    //Location
     void updateLocation() {
         if ((ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ||
             (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
@@ -388,37 +408,6 @@ public class MainActivity extends AppCompatActivity
             addMessagetoDatabase(myid, sendername, i, message, key);
         }
         return true;
-    }
-
-    public void addMessagetoDatabase(String myid, String sendername, String receiver, String msg, String key){
-        int count = spmessage.getInt("allmymessagescount",0);
-        for(int i = 0; i < count; ++i){
-            try {
-                JSONObject json = new JSONObject(spmessage.getString("allmymessages" + i, ""));
-                String k = json.getString("key");
-                if(key.equals(k)){
-                    return;
-                }
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-        JSONObject mssg = new JSONObject();
-        try {
-            mssg.put("sender", myid);
-            mssg.put("receiver", receiver);
-            mssg.put("name", sendername);
-            mssg.put("message", msg);
-            mssg.put("key", key);
-            spmessage.edit().putString("allmymessages"+count,mssg.toString()).apply();
-            spmessage.edit().putInt("allmymessagescount", ++count).apply();
-            if(receiver.equals(sp.getInt("myid", 0)+""))
-                new NotificationSender(this, "", "", sendername, msg);
-        }
-        catch (JSONException e){
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -510,8 +499,40 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    //Messages
+    public void addMessagetoDatabase(String myid, String sendername, String receiver, String msg, String key){
+        int count = spmessage.getInt("allmymessagescount",0);
+        for(int i = 0; i < count; ++i){
+            try {
+                JSONObject json = new JSONObject(spmessage.getString("allmymessages" + i, ""));
+                String k = json.getString("key");
+                if(key.equals(k)){
+                    return;
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        JSONObject mssg = new JSONObject();
+        try {
+            mssg.put("sender", myid);
+            mssg.put("receiver", receiver);
+            mssg.put("name", sendername);
+            mssg.put("message", msg);
+            mssg.put("key", key);
+            spmessage.edit().putString("allmymessages"+count,mssg.toString()).apply();
+            spmessage.edit().putInt("allmymessagescount", ++count).apply();
+            if(receiver.equals(sp.getInt("myid", 0)+""))
+                new NotificationSender(this, "", "", sendername, msg);
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
+   //Trigger
     private void initiateTrigger() {
-//        String gpsinfo="location";
         String response = sendJson();
 
         JSONObject json = null;
@@ -597,5 +618,17 @@ public class MainActivity extends AppCompatActivity
             super.onPostExecute(result);
             Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
         }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i ("isMyServiceRunning?", true+"");
+                return true;
+            }
+        }
+        Log.i ("isMyServiceRunning?", false+"");
+        return false;
     }
 }
