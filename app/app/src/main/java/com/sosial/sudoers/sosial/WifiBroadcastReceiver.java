@@ -75,60 +75,71 @@ public class WifiBroadcastReceiver extends Thread{
     public void initializeTimerTask() {
         timerTask = new TimerTask() {
             public void run() {
-            if (manager != null) {
-                manager.requestPeers(channel, new WifiP2pManager.PeerListListener() {
-                    @Override
-                    public void onPeersAvailable(WifiP2pDeviceList peers) {
-                        for(WifiP2pDevice wd: peers.getDeviceList()){
-                            connectToPeer(wd);
+                if (manager != null) {
+                    manager.requestPeers(channel, new WifiP2pManager.PeerListListener() {
+                        @Override
+                        public void onPeersAvailable(WifiP2pDeviceList peers) {
+                            for(WifiP2pDevice wd: peers.getDeviceList()){
+                                connectToPeer(wd);
+                            }
+                            Log.e("wifi_deers", "peer_size"+peers.getDeviceList().size());
                         }
-                        Log.e("wifi_deers", "peer_size"+peers.getDeviceList().size());
+                    });
+                }
+
+                String msg = "";
+                for (int i = 0; i < sp2.getInt("allmymessagescount", 0); ++i) {
+                    msg = msg.concat(sp2.getString("allmymessages" + i, "") + " ## ");
+                }
+
+                final String mymsg = msg;
+                final String myusers = sp2.getString("allmyusers", sp.getInt("myid", 0) + ",");
+
+                if (count++%1 == 0) {
+                    count = 1;
+                    try {
+                        Runnable runnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                Server s = new Server(cxt);
+                                s.execute(myusers, mymsg);
+                            }
+                        };
+                        Thread mythread = new Thread(runnable);
+                        mythread.start();
+    //                    String get = s.get();
+    //                    Log.e("wifi_d_message_server", get);
+    //                    if(!get.equals("finally")) {
+    //                        addUsers(get.split("###")[0]);
+    //                        addMessagetoDatabase(get.split("###")[1]);
+    //                    }
+
+                    } catch (Exception e) {
+                        Log.e("wifi_discover_except", e.toString());
+                    }
+                } else {
+                    try {
+                        Client c = new Client(myusers, msg);
+                        String get = c.get();
+                        Log.e("wifi_message_client", get);
+                        if(!get.equals("finally")) {
+                            addUsers(get.split("###")[0]);
+                            addMessagetoDatabase(get.split("###")[1]);
+                        }
+                    } catch (Exception e) {
+                        Log.e("wifi_discover_client_e", e.toString());
+                    }
+                }
+                manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+
+                    @Override
+                    public void onSuccess() {
+                    }
+
+                    @Override
+                    public void onFailure(int reasonCode) {
                     }
                 });
-            }
-
-            String msg = "";
-            for (int i = 0; i < sp2.getInt("allmymessagescount", 0); ++i) {
-                msg = msg.concat(sp2.getString("allmymessages" + i, "") + " ## ");
-            }
-            String myusers = sp2.getString("allmyusers", sp.getInt("myid", 0) + ",");
-
-            if (count++%5 == 0) {
-                count = 1;
-                try {
-                    Server s = new Server(myusers, msg);
-                    String get = s.get();
-                    Log.e("wifi_d_message_server", get);
-                    if(!get.equals("finally")) {
-                        addUsers(get.split("###")[0]);
-                        addMessagetoDatabase(get.split("###")[1]);
-                    }
-                } catch (Exception e) {
-                    Log.e("wifi_discover_except", e.toString());
-                }
-            } else {
-                try {
-                    Client c = new Client(myusers, msg);
-                    String get = c.get();
-                    Log.e("wifi_message_client", get);
-                    if(!get.equals("finally")) {
-                        addUsers(get.split("###")[0]);
-                        addMessagetoDatabase(get.split("###")[1]);
-                    }
-                } catch (Exception e) {
-                    Log.e("wifi_discover_client_e", e.toString());
-                }
-            }
-            manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
-
-                @Override
-                public void onSuccess() {
-                }
-
-                @Override
-                public void onFailure(int reasonCode) {
-                }
-            });
             }
         };
     }
@@ -159,15 +170,23 @@ public class WifiBroadcastReceiver extends Thread{
                         for (int i = 0; i < sp2.getInt("allmymessagescount", 0); ++i) {
                             msg = msg.concat(sp2.getString("allmymessages" + i, "") + " ## ");
                         }
-                        String myusers = sp2.getString("allmyusers", sp.getInt("myid", 0) + ",");
+                        final String mymsg = msg;
+                        final String myusers = sp2.getString("allmyusers", sp.getInt("myid", 0) + ",");
                         try {
                             if (info.isGroupOwner) {
-                                Server s = new Server(myusers, msg);
-                                String get = s.get();
-                                Log.e("wifi_d_message_server", get);
-                                if (!get.equals("finally")) {
-                                    addUsers(get.split("###")[0]);
-                                    addMessagetoDatabase(get.split("###")[1]);
+                                try {
+                                    Runnable runnable = new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Server s = new Server(cxt);
+                                            s.execute(myusers, mymsg);
+                                        }
+                                    };
+                                    Thread mythread = new Thread(runnable);
+                                    mythread.start();
+                                }
+                                catch (Exception e){
+                                    e.printStackTrace();
                                 }
                             } else {
                                 Client c = new Client(myusers, msg);

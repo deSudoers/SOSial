@@ -1,7 +1,6 @@
 package com.sosial.sudoers.sosial;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -58,14 +57,14 @@ public class Client {
                 }
             }
             catch (Exception e){
-                Log.e("wifi_client_catch", e.toString());
+                e.printStackTrace();
             }
             finally {
                 try {
                     sock.close();
                 }
                 catch (Exception e){
-                    Log.e("wifi_client_finally", e.toString());
+                    e.printStackTrace();
                 }
                 return message;
             }
