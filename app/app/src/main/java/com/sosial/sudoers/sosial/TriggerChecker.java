@@ -70,7 +70,6 @@ class checker implements Runnable{
     WifiManager wifiManager;
     private boolean trigger_done, iTurnedOn;
     private SharedPreferences sp, splocation, spmessages;
-    private final IntentFilter intentFilter = new IntentFilter();
     WifiBroadcastReceiver receiver;
     WifiP2pManager.Channel mChannel;
     WifiP2pManager mManager;
@@ -207,7 +206,7 @@ class checker implements Runnable{
 
                 senderId = msgJson.getString("sender");
                 receiverId = msgJson.getString("receiver");
-                message = msgJson.getString("name")+"#"+msgJson.getString("message");
+                message = msgJson.getString("message");
                 key = msgJson.getString("key");
 
                 JSONObject curMsg = new JSONObject();
@@ -245,10 +244,11 @@ class checker implements Runnable{
             try {
                 JSONObject msg = jsonMsg.getJSONObject(String.valueOf(i));
                 String myid = msg.getString("sender_id");
-                String receiver = msg.getString("receiver_id");
+                String receiver = msg.getInt("receiver_id")+"";
                 String mssg = msg.getString("message");
-                String key = msg.getString("unigue_key");
-                addMessagetoDatabase(myid, receiver, mssg, key);
+                String key = msg.getString("unique_id");
+                String sendername = msg.getString("sender_name");
+                addMessagetoDatabase(myid, sendername, receiver, mssg, key);
             }
             catch (Exception e){
                 break;
@@ -256,7 +256,7 @@ class checker implements Runnable{
         }
     }
 
-    public void addMessagetoDatabase(String myid, String receiver, String msg, String key){
+    public void addMessagetoDatabase(String myid, String sendername, String receiver, String msg, String key){
         int count = spmessages.getInt("allmymessagescount",0);
         for(int i = 0; i < count; ++i){
             try {
@@ -275,15 +275,13 @@ class checker implements Runnable{
         try {
             mssg.put("sender", myid);
             mssg.put("receiver", receiver);
-            String name = msg.split("#")[0];
-            String msssg = msg.split("#")[1];
-            if(receiver.equals(sp.getInt("myid", 0)+""))
-                new NotificationSender(cxt, "", "", name, msssg);
-            mssg.put("name", name);
-            mssg.put("message", msssg);
+            mssg.put("name", sendername);
+            mssg.put("message", msg);
             mssg.put("key", key);
             spmessages.edit().putString("allmymessages"+count,mssg.toString()).apply();
             spmessages.edit().putInt("allmymessagescount", ++count).apply();
+            if(receiver.equals(sp.getInt("myid", 0)+""))
+                new NotificationSender(cxt, "", "", sendername, msg);
         }
         catch (JSONException e){
             e.printStackTrace();

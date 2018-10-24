@@ -381,15 +381,16 @@ public class MainActivity extends AppCompatActivity
         String temp = sp.getString("userid", "");
 
         String myid = sp.getInt("myid", 0) + "";
-        String message = sp.getString("myname", "") + "#" + "This is my location, " + latitude + "," + longitude;
+        String sendername = sp.getString("myname", "");
+        String message =  "This is my location, " + latitude + "," + longitude;
         for (String i: myfamilyid){
-            String key = myid+i+message.substring(0,min(10, message.length()))+message.length();
-            addMessagetoDatabase(myid, i, message, key);
+            String key = myid+i+message.substring(message.length()-10, message.length())+message.length();
+            addMessagetoDatabase(myid, sendername, i, message, key);
         }
         return true;
     }
 
-    public void addMessagetoDatabase(String myid, String receiver, String msg, String key){
+    public void addMessagetoDatabase(String myid, String sendername, String receiver, String msg, String key){
         int count = spmessage.getInt("allmymessagescount",0);
         for(int i = 0; i < count; ++i){
             try {
@@ -407,15 +408,13 @@ public class MainActivity extends AppCompatActivity
         try {
             mssg.put("sender", myid);
             mssg.put("receiver", receiver);
-            String name = msg.split("#")[0];
-            String msssg = msg.split("#")[1];
-            if(receiver.equals(sp.getInt("myid", 0)+""))
-                new NotificationSender(this, "", "", name, msssg);
-            mssg.put("name", name);
-            mssg.put("message", msssg);
+            mssg.put("name", sendername);
+            mssg.put("message", msg);
             mssg.put("key", key);
             spmessage.edit().putString("allmymessages"+count,mssg.toString()).apply();
             spmessage.edit().putInt("allmymessagescount", ++count).apply();
+            if(receiver.equals(sp.getInt("myid", 0)+""))
+                new NotificationSender(this, "", "", sendername, msg);
         }
         catch (JSONException e){
             e.printStackTrace();
@@ -509,10 +508,6 @@ public class MainActivity extends AppCompatActivity
             super.onPostExecute(result);
             Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
         }
-    }
-
-    public int min(int x, int y){
-        return x<y?x:y;
     }
 
     private void initiateTrigger() {
