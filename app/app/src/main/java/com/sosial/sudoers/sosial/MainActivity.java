@@ -568,8 +568,9 @@ public class MainActivity extends AppCompatActivity
                 String cookie1 = sp.getString("token2","");
                 String cookie2 = sp.getString("token","");
                 response  = sdd.execute(url, postData.toString(), cookie1, cookie2).get();
-                if(response.equals("Trigger added."))
+                if(response.equals("{\"message\": \"Trigger added.\"}"))
                     response = "Disaster Event Created. Please Update Location and allow wifi communication.";
+                Log.e("triggercheck", response);
             }
             else{
                 response = "Please Update location before SOS.";
