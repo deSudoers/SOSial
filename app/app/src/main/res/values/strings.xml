@@ -55,5 +55,5 @@
     <string name="title_activity_shared_locations">SharedLocations</string>
     <string name="app_version">Version 0.1.0</string>
     <string name="end_process">End Processes</string>
-
+    <string name="about_us">SOSial is a service designed to assist people communicate and receive critical information before and during times of emergencies as well as disaster. The main differentiating factor about SOSial is that it is designed to work even without cellular network and internet services which are often unavailable during natural disasters.</string>
 </resources>
