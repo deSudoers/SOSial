@@ -402,7 +402,6 @@ public class MainActivity extends AppCompatActivity
         if (latitude.equals("") || latitude.equals(""))
             return false;
         String myfamilyid[] = sp.getString("userid", "").split(",");
-        String temp = sp.getString("userid", "");
 
         String myid = sp.getInt("myid", 0) + "";
         String sendername = sp.getString("myname", "");
@@ -434,6 +433,7 @@ public class MainActivity extends AppCompatActivity
         if(!lat.equals("") && !lon.equals("")){
             sendJson(lat+", "+lon);
         }
+        locationManager.removeUpdates(locationListener);
     }
 
     private String sendJson(String location){
@@ -570,7 +570,6 @@ public class MainActivity extends AppCompatActivity
                 response  = sdd.execute(url, postData.toString(), cookie1, cookie2).get();
                 if(response.equals("{\"message\": \"Trigger added.\"}"))
                     response = "Disaster Event Created. Please Update Location and allow wifi communication.";
-                Log.e("triggercheck", response);
             }
             else{
                 response = "Please Update location before SOS.";
