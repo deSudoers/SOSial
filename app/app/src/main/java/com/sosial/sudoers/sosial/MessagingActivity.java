@@ -9,6 +9,8 @@ import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,6 +33,19 @@ public class MessagingActivity extends AppCompatActivity {
     private Spinner mSpinner;
     private SharedPreferences sp;
     private SharedPreferences sp2;
+    private String blockCharacterSet = "#";
+
+    private InputFilter filter = new InputFilter() {
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+
+            if (source != null && blockCharacterSet.contains(("" + source))) {
+                return "";
+            }
+            return null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +64,7 @@ public class MessagingActivity extends AppCompatActivity {
         mSpinner.setAdapter(adapter);
 
         mMessage = (EditText) findViewById(R.id.editText);
+        mMessage.setFilters(new InputFilter[] { filter });
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
