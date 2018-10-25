@@ -33,13 +33,12 @@ public class MessagingActivity extends AppCompatActivity {
     private Spinner mSpinner;
     private SharedPreferences sp;
     private SharedPreferences sp2;
-    private String blockCharacterSet = "#";
 
     private InputFilter filter = new InputFilter() {
 
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-
+            String blockCharacterSet = "#";
             if (source != null && blockCharacterSet.contains(("" + source))) {
                 return "";
             }
