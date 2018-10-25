@@ -59,7 +59,7 @@ public class SharedLocations extends AppCompatActivity implements OnMapReadyCall
 //                        .setAction("Action", null).show();
 //            }
 //        });
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
