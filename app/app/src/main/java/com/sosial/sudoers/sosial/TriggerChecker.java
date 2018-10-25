@@ -236,7 +236,7 @@ public class TriggerChecker extends Service {
             for (int i = 0; ; i++) {
                 try {
                     JSONObject msg = jsonMsg.getJSONObject(String.valueOf(i));
-                    String myid = msg.getString("sender_id");
+                    String myid = msg.getInt("sender_id")+"";
                     String receiver = msg.getInt("receiver_id") + "";
                     String mssg = msg.getString("message");
                     String key = msg.getString("unique_id");
