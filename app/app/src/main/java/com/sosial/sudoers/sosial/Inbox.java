@@ -74,6 +74,11 @@ public class Inbox extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+    }
+
     private void renderMessages() {
         numOfMsgs = allmessages.getInt("allmymessagescount",0);
         String msgJsonStr;
