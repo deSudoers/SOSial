@@ -3,7 +3,6 @@ package com.sosial.sudoers.sosial;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,9 +67,17 @@ public class Client extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String s){
-        if (!s.equals("finally")) {
-            addUsers(s.split("###")[0]);
-            addMessagetoDatabase(s.split("###")[1]);
+        try {
+            if (!s.equals("finally")) {
+                String ss[] = s.split("###");
+                String users = ss[0];
+                String msgs = ss[1];
+                addUsers(users);
+                addMessagetoDatabase(msgs);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -109,7 +116,6 @@ public class Client extends AsyncTask<String, Void, String> {
         String msgs[] = allmsgs.split("##");
         for(String msg: msgs){
             try{
-                Log.e("addusersmsg_", msg);
                 JSONObject json = new JSONObject(msg);
                 String myid = json.getString("sender");
                 String receiver = json.getString("receiver");
@@ -125,7 +131,6 @@ public class Client extends AsyncTask<String, Void, String> {
     }
 
     public void addUsers(String allusers){
-        Log.e("addusers", allusers);
         String users[] = allusers.split(",");
         String allmyusers = spmessages.getString("allmyusers", sp.getInt("myid", 0)+",");
         String already[] = allmyusers.split(",");

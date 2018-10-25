@@ -35,7 +35,6 @@ class Server extends AsyncTask<String, Void, String>{
             e.printStackTrace();
         }
         try {
-            Log.e("wifi_server", "inside_try");
             socket = sock.accept();
             InputStream in = socket.getInputStream();
 
@@ -62,9 +61,17 @@ class Server extends AsyncTask<String, Void, String>{
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        if (!s.equals("finally")) {
-            addUsers(s.split("###")[0]);
-            addMessagetoDatabase(s.split("###")[1]);
+        try {
+            if (!s.equals("finally")) {
+                String ss[] = s.split("###");
+                String users = ss[0];
+                String msgs = ss[1];
+                addUsers(users);
+                addMessagetoDatabase(msgs);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -103,7 +110,6 @@ class Server extends AsyncTask<String, Void, String>{
         String msgs[] = allmsgs.split("##");
         for(String msg: msgs){
             try{
-                Log.e("addusersmsg_", msg);
                 JSONObject json = new JSONObject(msg);
                 String myid = json.getString("sender");
                 String receiver = json.getString("receiver");
@@ -119,7 +125,6 @@ class Server extends AsyncTask<String, Void, String>{
     }
 
     public void addUsers(String allusers){
-        Log.e("addusers", allusers);
         String users[] = allusers.split(",");
         String allmyusers = spmessages.getString("allmyusers", sp.getInt("myid", 0)+",");
         String already[] = allmyusers.split(",");
