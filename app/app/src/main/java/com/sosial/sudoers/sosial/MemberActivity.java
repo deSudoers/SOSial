@@ -113,11 +113,9 @@ public class MemberActivity extends AppCompatActivity{
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
-            focusView.requestFocus();
             sp.edit().putString("member_error", "An Error Occurred. Please Try Again.").apply();
         }
         else {
-
             String response = sendJson(email);
             String rid = "", rname ="", remail="";
             JSONObject json = null;
@@ -221,11 +219,6 @@ public class MemberActivity extends AppCompatActivity{
             }
 
             return data;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
         }
     }
 
