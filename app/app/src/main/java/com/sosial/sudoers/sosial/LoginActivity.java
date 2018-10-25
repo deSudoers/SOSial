@@ -2,7 +2,6 @@ package com.sosial.sudoers.sosial;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,7 +9,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,7 +34,6 @@ public class LoginActivity extends AppCompatActivity {
     private View mLoginFormView;
 
     private SharedPreferences sp;
-    Intent mServiceIntent;
     Context ctx;
 
     @Override
@@ -95,10 +92,13 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        stopService(mServiceIntent);
-        Log.i("MAINACT", "onDestroy!");
         super.onDestroy();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.finishAffinity();
     }
 
     private void attemptLogin() {
@@ -205,7 +205,6 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
         }
     }
 

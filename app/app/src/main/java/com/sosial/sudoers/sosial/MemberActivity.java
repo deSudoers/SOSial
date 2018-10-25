@@ -27,6 +27,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static java.net.HttpURLConnection.HTTP_OK;
+
 public class MemberActivity extends AppCompatActivity{
 
     // UI references.
@@ -155,7 +157,9 @@ public class MemberActivity extends AppCompatActivity{
         try{
             postData.put("email", email);
             AddRequest sdd =  new AddRequest();
-            response  = sdd.execute(url, postData.toString()).get();
+            String cookie1 = sp.getString("token2", "");
+            String cookie2 = sp.getString("token", "");
+            response  = sdd.execute(url, postData.toString(), cookie1, cookie2).get();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -166,7 +170,7 @@ public class MemberActivity extends AppCompatActivity{
     }
 
 
-    class AddRequest extends AsyncTask<String, Void, String>{
+    static class AddRequest extends AsyncTask<String, Void, String>{
         @Override
         protected String doInBackground(String... params) {
 
@@ -175,8 +179,8 @@ public class MemberActivity extends AppCompatActivity{
             HttpURLConnection httpURLConnection = null;
             try {
                 httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
-                httpURLConnection.addRequestProperty("cookie", sp.getString("token2",""));
-                httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
+                httpURLConnection.addRequestProperty("cookie", params[2]);
+                httpURLConnection.addRequestProperty("cookie", params[3]);
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json");
                 httpURLConnection.setDoOutput(true);
@@ -187,7 +191,7 @@ public class MemberActivity extends AppCompatActivity{
                 wr.close();
 
                 int response = httpURLConnection.getResponseCode();
-                if(response == httpURLConnection.HTTP_OK){
+                if(response == HTTP_OK){
                     String line;
                     BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
                     while ((line = br.readLine()) != null){
@@ -222,7 +226,6 @@ public class MemberActivity extends AppCompatActivity{
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
         }
     }
 
@@ -264,12 +267,11 @@ public class MemberActivity extends AppCompatActivity{
         try{
             postData.put("email", id);
             DeleteRequest sdd =  new DeleteRequest();
-            response  = sdd.execute(url, postData.toString()).get();
+            String cookie1 = sp.getString("token2", "");
+            String cookie2 = sp.getString("token", "");
+            response  = sdd.execute(url, postData.toString(), cookie1, cookie2).get();
         }
         catch (JSONException e){
-            e.printStackTrace();
-        }
-        catch (Exception e){
             e.printStackTrace();
         }
         finally {
@@ -277,7 +279,7 @@ public class MemberActivity extends AppCompatActivity{
         }
     }
 
-    class DeleteRequest extends AsyncTask<String, Void, String> {
+    static class DeleteRequest extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
 
@@ -286,8 +288,8 @@ public class MemberActivity extends AppCompatActivity{
             HttpURLConnection httpURLConnection = null;
             try {
                 httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
-                httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
-                httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
+                httpURLConnection.addRequestProperty("cookie", params[2]);
+                httpURLConnection.addRequestProperty("cookie", params[3]);
                 httpURLConnection.setRequestMethod("DELETE");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json");
                 httpURLConnection.setDoOutput(true);
@@ -297,7 +299,7 @@ public class MemberActivity extends AppCompatActivity{
                 wr.flush();
                 wr.close();
                 int response = httpURLConnection.getResponseCode();
-                if(response == httpURLConnection.HTTP_OK){
+                if(response == HTTP_OK){
                     data = "Deleted Successfully.";
                 }
                 else{
@@ -318,7 +320,6 @@ public class MemberActivity extends AppCompatActivity{
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
         }
     }
 

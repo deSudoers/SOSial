@@ -107,7 +107,7 @@ public class MessagingActivity extends AppCompatActivity {
 
     private String sendJson(String id, String msg){
         String url = "https://sosial.azurewebsites.net/message";
-        String response = "";
+        String response = "An Error Occurred. Please Try Again.";
         JSONObject postData = new JSONObject();
         try{
             JSONObject postDatai = new JSONObject();
@@ -119,8 +119,9 @@ public class MessagingActivity extends AppCompatActivity {
             postDatai.put("unique_key", key);
             postData.put("0", postDatai);
             addMessagetoDatabase(myid, sp.getString("myname", ""), id, msg, key);
-            SendRequest sdd =  new SendRequest();
-            response  = sdd.execute(url, postData.toString()).get();
+//            SendRequest sdd =  new SendRequest();
+//            response  = sdd.execute(url, postData.toString()).get();
+            response = "Sent Successfully";
         }
         catch (Exception e){
             e.printStackTrace();
@@ -130,48 +131,48 @@ public class MessagingActivity extends AppCompatActivity {
         }
     }
 
-    class SendRequest extends AsyncTask<String, Void, String>{
-        @Override
-        protected String doInBackground(String... params) {
-
-            String data = "Message Saved for Sharing Over Wifi";
-
-            HttpURLConnection httpURLConnection = null;
-            try {
-                httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
-                httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
-                httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
-                httpURLConnection.setRequestMethod("PUT");
-                httpURLConnection.setRequestProperty("Content-Type", "application/json");
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.setDoInput(true);
-                DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
-                wr.writeBytes(params[1]);
-                wr.flush();
-                wr.close();
-
-                int response = httpURLConnection.getResponseCode();
-                if(response == 200)
-                    data = "Message sent to server.";
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            finally {
-                if (httpURLConnection != null) {
-                    httpURLConnection.disconnect();
-                }
-            }
-
-            return data;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
-        }
-    }
+//    class SendRequest extends AsyncTask<String, Void, String>{
+//        @Override
+//        protected String doInBackground(String... params) {
+//
+//            String data = "Message Saved for Sharing Over Wifi";
+//
+//            HttpURLConnection httpURLConnection = null;
+//            try {
+//                httpURLConnection = (HttpURLConnection) new URL(params[0]).openConnection();
+//                httpURLConnection.addRequestProperty("cookie", sp.getString("token2", ""));
+//                httpURLConnection.addRequestProperty("cookie", sp.getString("token", ""));
+//                httpURLConnection.setRequestMethod("PUT");
+//                httpURLConnection.setRequestProperty("Content-Type", "application/json");
+//                httpURLConnection.setDoOutput(true);
+//                httpURLConnection.setDoInput(true);
+//                DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
+//                wr.writeBytes(params[1]);
+//                wr.flush();
+//                wr.close();
+//
+//                int response = httpURLConnection.getResponseCode();
+//                if(response == 200)
+//                    data = "Message sent to server.";
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            finally {
+//                if (httpURLConnection != null) {
+//                    httpURLConnection.disconnect();
+//                }
+//            }
+//
+//            return data;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String result) {
+//            super.onPostExecute(result);
+//            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
+//        }
+//    }
 
     public void addMessagetoDatabase(String myid, String name, String receiver, String msg, String key){
         int count = sp2.getInt("allmymessagescount",0);

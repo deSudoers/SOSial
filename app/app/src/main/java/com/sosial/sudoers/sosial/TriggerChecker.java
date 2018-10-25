@@ -24,17 +24,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class TriggerChecker extends Service {
-    Context cxt;
     private static volatile boolean exit;
     private static volatile boolean trigger_done;
 
-    public TriggerChecker(Context applicationContext) {
+    public TriggerChecker(){
         super();
-        cxt = applicationContext;
-    }
-
-    public TriggerChecker() {
-
     }
 
     @Override
@@ -80,7 +74,7 @@ public class TriggerChecker extends Service {
 
         checker(Context cxt) {
             this.cxt = cxt;
-            wifiManager = (WifiManager) cxt.getSystemService(Context.WIFI_SERVICE);
+            wifiManager = (WifiManager) cxt.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         }
 
         public void run() {
@@ -89,7 +83,7 @@ public class TriggerChecker extends Service {
             timer.schedule(timerTask, 0, 30000);
         }
 
-        public void initializeTimerTask() {
+        private void initializeTimerTask() {
             sp = cxt.getSharedPreferences("login", MODE_PRIVATE);
             splocation = cxt.getSharedPreferences("location", MODE_PRIVATE);
             spmessages = cxt.getSharedPreferences("allmessages", MODE_PRIVATE);
@@ -329,7 +323,6 @@ public class TriggerChecker extends Service {
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
-                Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
             }
         }
     }

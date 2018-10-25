@@ -7,7 +7,6 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.util.Log;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -56,7 +55,6 @@ public class WifiBroadcastReceiver extends Thread{
                             for(WifiP2pDevice wd: peers.getDeviceList()){
                                 connectToPeer(wd);
                             }
-                            Log.e("wifi_deers", "peer_size"+peers.getDeviceList().size());
                         }
                     });
                 }
@@ -131,14 +129,12 @@ public class WifiBroadcastReceiver extends Thread{
         // Picking the first device found on the network.;
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = peer.deviceAddress;
-        Log.e("wifi_discover_master","address"+config.deviceAddress);
 
         manager.connect(channel, config, new WifiP2pManager.ActionListener() {
 
             @Override
             public void onSuccess() {
                 // WiFiDirectBroadcastReceiver notifies us. Ignore for now.
-                Log.e("wifi_discover","Connected");
                 manager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
                     @Override
                     public void onConnectionInfoAvailable(WifiP2pInfo info) {
@@ -189,9 +185,7 @@ public class WifiBroadcastReceiver extends Thread{
             }
 
             @Override
-            public void onFailure(int reason) {
-                Log.e("wifi_discover","Connection Failed");
-            }
+            public void onFailure(int reason) {}
         });
     }
 }

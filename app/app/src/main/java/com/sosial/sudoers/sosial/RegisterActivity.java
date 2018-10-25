@@ -249,7 +249,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
-            focusView.requestFocus();
+//            focusView.requestFocus();
             sp.edit().putString("register_error", "An Error Occurred. Please Try Again").apply();
         } else {
             // Show a progress spinner, and kick off a background task to
@@ -300,9 +300,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             postData.put("last_name", params[5]);
             SendRequest sdd =  new SendRequest();
             response  = sdd.execute(url, postData.toString()).get();
-        }
-        catch (JSONException e){
-            e.printStackTrace();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -360,7 +357,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            Log.e("TAG", result); // this is expecting a response code to be sent from your server upon receiving the POST data
         }
     }
 
