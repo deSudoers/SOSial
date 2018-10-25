@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         if(mTriggerChecker == null)
             mTriggerChecker = new TriggerChecker();
         if(mServiceIntent == null)
@@ -242,7 +241,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_shared_locations) {
             viewSharedLocations();
 
-        } else if (id == R.id.nav_manage) {
+//        } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_profile) {
             viewMyProfile();
@@ -570,6 +569,8 @@ public class MainActivity extends AppCompatActivity
                 response  = sdd.execute(url, postData.toString(), cookie1, cookie2).get();
                 if(response.equals("{\"message\": \"Trigger added.\"}"))
                     response = "Disaster Event Created. Please Update Location and allow wifi communication.";
+                else
+                    response = "Disaster Event Created Locally. Please Update Location and allow wifi communication.";
             }
             else{
                 response = "Please Update location before SOS.";

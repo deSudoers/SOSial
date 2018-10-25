@@ -16,10 +16,10 @@
             android:id="@+id/nav_shared_locations"
             android:icon="@mipmap/ic_shared_location_marker"
             android:title="@string/shared_locations" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+        <!--<item-->
+            <!--android:id="@+id/nav_manage"-->
+            <!--android:icon="@drawable/ic_menu_manage"-->
+            <!--android:title="Tools" />-->
     </group>
 
     <item android:title="@string/account">
