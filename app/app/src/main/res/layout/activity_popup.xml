@@ -16,7 +16,7 @@
         android:textSize="50sp"
         android:layout_gravity="center_horizontal"
         android:textAlignment="center"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="60dp"
         android:textStyle="bold"/>
 
     <TextView
@@ -29,12 +29,24 @@
         android:textColor="@android:color/white"
         android:layout_marginTop="20dp"
         android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/createdBy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="20dp"
+        android:textSize="10sp"
+        android:text="@string/createdby"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textStyle="italic" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="30dp">
+        android:layout_marginRight="20dp">
 
 
         <TextView
@@ -44,9 +56,9 @@
             android:layout_gravity="center"
             android:layout_margin="20dp"
             android:fontFamily="sans-serif"
-            android:textColor="@android:color/white"
             android:maxLines="12"
-            android:text="@string/about_us"/>
+            android:text="@string/about_us"
+            android:textColor="@android:color/white" />
     </ScrollView>
 </LinearLayout>
 
