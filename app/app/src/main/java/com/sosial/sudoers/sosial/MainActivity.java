@@ -119,12 +119,20 @@ public class MainActivity extends AppCompatActivity
         Button openTrigger = (Button) findViewById(R.id.opentrigger);
         openTrigger.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
+                Snackbar.make(view, "Sending Request...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 updateLocation();
-                Snackbar.make(view, initiateTrigger(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                if (!isMyServiceRunning(mTriggerChecker.getClass()))
-                    startService(mServiceIntent);
-                sp.edit().putBoolean("trigger", true).apply();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        Snackbar.make(view, initiateTrigger(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                        if (!isMyServiceRunning(mTriggerChecker.getClass()))
+                            startService(mServiceIntent);
+                        sp.edit().putBoolean("trigger", true).apply();
+                    }
+                };
+                Thread thread = new Thread(runnable);
+                thread.start();
             }
         });
 
@@ -136,7 +144,14 @@ public class MainActivity extends AppCompatActivity
             public void onLocationChanged(Location location) {
                 splocation.edit().putString("latitude", location.getLatitude() + "").apply();
                 splocation.edit().putString("longitude", location.getLongitude() + "").apply();
-                serverUpdateLocation();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        serverUpdateLocation();
+                    }
+                };
+                Thread thread = new Thread(runnable);
+                thread.start();
             }
 
             @Override
@@ -157,9 +172,9 @@ public class MainActivity extends AppCompatActivity
         };
         mUpdateLocation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
+                Snackbar.make(v, "Sending Request...", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 updateLocation();
-
             }
         });
 
@@ -431,8 +446,8 @@ public class MainActivity extends AppCompatActivity
         String lon= splocation.getString("longitude", "");
         if(!lat.equals("") && !lon.equals("")){
             sendJson(lat+", "+lon);
+            locationManager.removeUpdates(locationListener);
         }
-        locationManager.removeUpdates(locationListener);
     }
 
     private String sendJson(String location){
@@ -445,6 +460,7 @@ public class MainActivity extends AppCompatActivity
             String cookie1 = sp.getString("token2","");
             String cookie2 = sp.getString("token","");
             response  = sl.execute(url, postData.toString(), cookie1, cookie2).get();
+            Snackbar.make(getWindow().getDecorView().getRootView(), response, Snackbar.LENGTH_LONG).setAction("Action", null).show();
         }
         catch (Exception e){
             e.printStackTrace();
@@ -476,11 +492,7 @@ public class MainActivity extends AppCompatActivity
 
                 int response = httpURLConnection.getResponseCode();
                 if(response == httpURLConnection.HTTP_OK){
-                    String line;
-                    BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-                    while ((line = br.readLine()) != null){
-                        data += line;
-                    }
+                    data = "Location Updated.";
                 }
                 else{
                     data = "An Error Occurred. Please Try Again.";

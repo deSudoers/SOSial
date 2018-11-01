@@ -69,10 +69,19 @@ public class MessagingActivity extends AppCompatActivity {
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View view) {
-                sendMessage();
-                Snackbar.make(view, sp.getString("message_error", "An Error Occurred. Please Try Again."), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(final View view) {
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        Snackbar.make(view, "Sending Message...", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        sendMessage();
+                        Snackbar.make(view, sp.getString("message_error", "An Error Occurred. Please Try Again."), Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    }
+                };
+                Thread thread = new Thread(runnable);
+                thread.start();
             }
         });
     }
@@ -121,8 +130,7 @@ public class MessagingActivity extends AppCompatActivity {
             postData.put("0", postDatai);
             addMessagetoDatabase(myid, sp.getString("myname", ""), id, msg, key);
             SendRequest sdd =  new SendRequest();
-            response  = sdd.execute(url, postData.toString()).get();
-            response = "Sent Successfully";
+            response = sdd.execute(url, postData.toString()).get();
         }
         catch (Exception e){
             e.printStackTrace();

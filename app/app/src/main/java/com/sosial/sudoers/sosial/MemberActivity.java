@@ -53,21 +53,49 @@ public class MemberActivity extends AppCompatActivity{
         mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View view) {
-                addMember();
-                Snackbar.make(view, sp.getString("member_error", "An Error Occurred. Please Try Again."), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                changeList();
+            public void onClick(final View view) {
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        Snackbar.make(view, "Sending Request...", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        addMember();
+                        Snackbar.make(view, sp.getString("member_error", "An Error Occurred. Please Try Again."), Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                changeList();
+                            }
+                        });
+                    }
+                };
+                Thread thread = new Thread(runnable);
+                thread.start();
             }
         });
 
         mDeleteMember.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
-                removeMember();
-                Snackbar.make(v, sp.getString("member_error", "An Error Occurred. Please Try Again"), Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                changeList();
+            public void onClick(final View v) {
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        Snackbar.make(v, "Sending Request...", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        removeMember();
+                        Snackbar.make(v, sp.getString("member_error", "An Error Occurred. Please Try Again"), Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                changeList();
+                            }
+                        });
+                    }
+                };
+                Thread thread = new Thread(runnable);
+                thread.start();
             }
         });
 
@@ -75,10 +103,15 @@ public class MemberActivity extends AppCompatActivity{
     }
 
     public void changeList(){
-        String names[] = sp.getString("email", "").split(",");
-        ArrayAdapter<String> adapter= new ArrayAdapter<>(MemberActivity.this, android.R.layout.simple_spinner_dropdown_item, names);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerlist.setAdapter(adapter);
+        try {
+            String names[] = sp.getString("email", "").split(",");
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(MemberActivity.this, android.R.layout.simple_spinner_dropdown_item, names);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mSpinnerlist.setAdapter(adapter);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -90,61 +123,30 @@ public class MemberActivity extends AppCompatActivity{
     }
 
     private void addMember() {
-        // Reset errors.
-        mEmailView.setError(null);
-
-        // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
 
-        boolean cancel = false;
-        View focusView = null;
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
+        String response = sendJson(email);
+        String rid = "", rname ="", remail="";
+        JSONObject json;
+        try {
+            json = new JSONObject(response);
+            rid = json.getString("user_id");
+            rname = json.getString("name");
+            remail = json.getString("email");
+            String old = sp.getString("userid", "");
+            old += rid+",";
+            sp.edit().putString("userid", old).apply();
+            old = sp.getString("name", "");
+            old += rname+",";
+            sp.edit().putString("name", old).apply();
+            old = sp.getString("email", "");
+            old += remail+",";
+            sp.edit().putString("email", old).apply();
+            sp.edit().putString("member_error", "Added Successfully.").apply();
         }
-
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            sp.edit().putString("member_error", "An Error Occurred. Please Try Again.").apply();
-        }
-        else {
-            String response = sendJson(email);
-            String rid = "", rname ="", remail="";
-            JSONObject json = null;
-            try {
-                json = new JSONObject(response);
-                rid = json.getString("user_id");
-                rname = json.getString("name");
-                remail = json.getString("email");
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-
-            if(!response.equals("User Not Found.") && !response.equals("An Error Occurred. Please Try Again.")
-                    && !response.equals("User Cannot be Family Member.") && !response.equals("User Already in Family.")){
-                String old = sp.getString("userid", "");
-                old += rid+",";
-                sp.edit().putString("userid", old).apply();
-                old = sp.getString("name", "");
-                old += rname+",";
-                sp.edit().putString("name", old).apply();
-                old = sp.getString("email", "");
-                old += remail+",";
-                sp.edit().putString("email", old).apply();
-                sp.edit().putString("member_error", "Added Successfully").apply();
-            }
-            else{
-                sp.edit().putString("member_error", response).apply();
-            }
+        catch (Exception e){
+            e.printStackTrace();
+            sp.edit().putString("member_error", response).apply();
         }
     }
 
@@ -172,7 +174,7 @@ public class MemberActivity extends AppCompatActivity{
         @Override
         protected String doInBackground(String... params) {
 
-            String data = "";
+            String data = "An Error Occurred. Please Try Again.";
 
             HttpURLConnection httpURLConnection = null;
             try {
@@ -190,6 +192,7 @@ public class MemberActivity extends AppCompatActivity{
 
                 int response = httpURLConnection.getResponseCode();
                 if(response == HTTP_OK){
+                    data = "";
                     String line;
                     BufferedReader br = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
                     while ((line = br.readLine()) != null){
@@ -229,7 +232,7 @@ public class MemberActivity extends AppCompatActivity{
         if(id != "") {
             String response = sendJson2(id);
 
-            if (!response.equals("An Error Occurred. Please Try Again.")) {
+            if (response.equals("Deleted Successfully.")) {
                 String old[] = sp.getString("userid", "").split(",");
                 String old2[] = sp.getString("name", "").split(",");
                 String old3[] = sp.getString("email", "").split(",");
@@ -246,10 +249,8 @@ public class MemberActivity extends AppCompatActivity{
                 sp.edit().putString("userid", newuser).apply();
                 sp.edit().putString("name", newname).apply();
                 sp.edit().putString("email", newemail).apply();
-                sp.edit().putString("member_error", "Deleted Successfully").apply();
-            } else {
-                sp.edit().putString("member_error", response).apply();
             }
+            sp.edit().putString("member_error", response).apply();
         }
     }
 
@@ -276,7 +277,7 @@ public class MemberActivity extends AppCompatActivity{
         @Override
         protected String doInBackground(String... params) {
 
-            String data = "";
+            String data = "An Error Occurred. Please Try Again.";
 
             HttpURLConnection httpURLConnection = null;
             try {
