@@ -1,8 +1,11 @@
 package com.sosial.sudoers.sosial;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.icu.lang.UScript;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 
@@ -129,8 +132,18 @@ public class MessagingActivity extends AppCompatActivity {
             postDatai.put("unique_key", key);
             postData.put("0", postDatai);
             addMessagetoDatabase(myid, sp.getString("myname", ""), id, msg, key);
-            SendRequest sdd =  new SendRequest();
-            response = sdd.execute(url, postData.toString()).get();
+            ConnectivityManager cm =
+                    (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+            if(isConnected) {
+                SendRequest sdd = new SendRequest();
+                response = sdd.execute(url, postData.toString()).get();
+            }
+            else{
+                response = "Message Saved for Sharing Over Wifi";
+            }
         }
         catch (Exception e){
             e.printStackTrace();

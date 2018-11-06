@@ -474,7 +474,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected String doInBackground(String... params) {
 
-            String data = "";
+            String data = "Could not Update Location on Server.";
 
             HttpURLConnection httpURLConnection = null;
             try {

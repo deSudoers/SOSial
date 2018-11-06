@@ -9,7 +9,6 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +16,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -30,6 +30,7 @@ public class TriggerChecker extends Service {
     public TriggerChecker(){
         super();
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -115,9 +116,47 @@ public class TriggerChecker extends Service {
                                         e.printStackTrace();
                                     }
                                     new NotificationSender(cxt, "", "", "Alert", "Disaster has Occurred.");
-                                    receiver = new WifiBroadcastReceiver(cxt);
+                                    receiver = new WifiBroadcastReceiver(cxt, wifiManager);
                                 }
 
+                                try {
+                                    mManager = (WifiP2pManager)getSystemService(Context.WIFI_P2P_SERVICE);
+                                    mChannel = mManager.initialize(cxt, getMainLooper(), new WifiP2pManager.ChannelListener() {
+                                        @Override
+                                        public void onChannelDisconnected() {
+                                            mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+                                        }
+                                    });
+                                    Class[] paramTypes = new Class[3];
+                                    paramTypes[0] = WifiP2pManager.Channel.class;
+                                    paramTypes[1] = String.class;
+                                    paramTypes[2] = WifiP2pManager.ActionListener.class;
+                                    Method setDeviceName = mManager.getClass().getMethod(
+                                            "setDeviceName", paramTypes);
+                                    setDeviceName.setAccessible(true);
+
+                                    Object arglist[] = new Object[3];
+                                    arglist[0] = mChannel;
+                                    arglist[1] = "SOSIAL"+sp.getInt("myid", 0);
+                                    arglist[2] = new WifiP2pManager.ActionListener() {
+
+                                        @Override
+                                        public void onSuccess() {}
+
+                                        @Override
+                                        public void onFailure(int reason) {}
+                                    };
+                                    setDeviceName.invoke(mManager, arglist);
+
+                                } catch (NoSuchMethodException e) {
+                                    e.printStackTrace();
+                                } catch (IllegalAccessException e) {
+                                    e.printStackTrace();
+                                } catch (IllegalArgumentException e) {
+                                    e.printStackTrace();
+                                } catch (InvocationTargetException e) {
+                                    e.printStackTrace();
+                                }
                             } else {
                                 if (iTurnedOn) {
                                     wifiManager.setWifiEnabled(false);

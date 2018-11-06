@@ -3,6 +3,7 @@ package com.sosial.sudoers.sosial;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,7 +29,7 @@ class Server extends AsyncTask<String, Void, String>{
         String message = "finally";
         try{
             sock = new ServerSocket(5678);
-            sock.setSoTimeout(20000);
+            sock.setSoTimeout(30000);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -36,7 +37,6 @@ class Server extends AsyncTask<String, Void, String>{
         try {
             socket = sock.accept();
             InputStream in = socket.getInputStream();
-
             ObjectInputStream ois = new ObjectInputStream(in);
             message = (String) ois.readObject();
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
@@ -45,6 +45,7 @@ class Server extends AsyncTask<String, Void, String>{
             ois.close();
             oos.close();
             socket.close();
+//            spmessages.edit().putString("connected", params[2]).apply();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

@@ -3,6 +3,7 @@ package com.sosial.sudoers.sosial;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +28,7 @@ public class Client extends AsyncTask<String, Void, String> {
     }
     @Override
     protected String doInBackground(String... params){
+        int count = 1;
         InetAddress targetIP = null;
         String message = "finally";
         try {
@@ -36,33 +38,40 @@ public class Client extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
         Socket sock = null;
-        try {
-            sock = new Socket();
-            sock.connect(new InetSocketAddress(targetIP, port), 10000);
-            if (sock.isConnected()) {
+        while(true) {
+            if(count++>60)
+                break;
+            try {
+                sock = new Socket();
+                sock.connect(new InetSocketAddress(targetIP, port));
                 OutputStream out = sock.getOutputStream();
                 ObjectOutputStream output = new ObjectOutputStream(out);
-                String send = params[0]+"###"+params[1];
+                String send = params[0] + "###" + params[1];
                 output.writeObject(send);
                 InputStream in = sock.getInputStream();
                 ObjectInputStream input = new ObjectInputStream(in);
                 message = (String) input.readObject();
                 out.close();
                 output.close();
-            }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                sock.close();
-            }
-            catch (Exception e){
+//                spmessages.edit().putString("connected", params[2]).apply();
+                return message;
+            } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    sock.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            return message;
+            try {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException ie){
+                ie.printStackTrace();
+            }
         }
+        return message;
     }
 
     @Override
