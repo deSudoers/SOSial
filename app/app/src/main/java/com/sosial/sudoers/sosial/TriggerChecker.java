@@ -117,6 +117,11 @@ public class TriggerChecker extends Service {
                                     }
                                     new NotificationSender(cxt, "", "", "Alert", "Disaster has Occurred.");
                                     receiver = new WifiBroadcastReceiver(cxt, wifiManager);
+
+//                                    Server s = new Server(cxt);
+//                                    new Thread(s).start();
+//                                    Client c = new Client(cxt);
+//                                    new Thread(c).start();
                                 }
 
                                 try {

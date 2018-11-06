@@ -8,7 +8,6 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -112,14 +111,24 @@ public class WifiBroadcastReceiver extends Thread{
                         for (WifiP2pDevice wd : lists) {
                             connectToPeer(wd);
                             count++;
-                            new NotificationSender(cxt, wd.deviceName, wd.deviceName, wd.deviceName, wd.deviceName);
+//                            new NotificationSender(cxt, wd.deviceName, wd.deviceName, wd.deviceName, wd.deviceName);
                         }
                     }
                     catch (ConcurrentModificationException cme){
                         cme.printStackTrace();
                     }
                 }
-//
+
+                if(!Server.running){
+                    Server.running = true;
+                    Server s = new Server(cxt);
+                    new Thread(s).start();
+                }
+                if(!Client.running){
+                    Client.running = true;
+                    Client c = new Client(cxt);
+                    new Thread(c).start();
+                }
 //                String msg = "";
 //                for (int i = 0; i < sp2.getInt("allmymessagescount", 0); ++i) {
 //                    msg = msg.concat(sp2.getString("allmymessages" + i, "") + " ## ");
@@ -204,61 +213,56 @@ public class WifiBroadcastReceiver extends Thread{
             public void onSuccess() {
                 // WiFiDirectBroadcastReceiver notifies us. Ignore for now.
                 manager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
-
-                    @Override
+//
+//                    @Override
                     public void onConnectionInfoAvailable(WifiP2pInfo info) {
-                        Log.e("wifi_test", info.toString());
+//                        Log.e("wifi_test", info.toString());
                         sp2.edit().putString("connected", peer.deviceName).apply();
-                        String msg = "";
-                        for (int i = 0; i < sp2.getInt("allmymessagescount", 0); ++i) {
-                            msg = msg.concat(sp2.getString("allmymessages" + i, "") + " ## ");
-                        }
-                        final String mymsg = msg;
-                        final String myusers = sp2.getString("allmyusers", sp.getInt("myid", 0) + ",");
-//                        if(info.groupFormed) {
-                            try {
-                                if (info.isGroupOwner) {
-                                    try {
-                                        Runnable runnable = new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Server s = new Server(cxt);
-                                                try {
-                                                    s.execute(myusers, mymsg, peer.deviceName);
-                                                }
-                                                catch (Exception e){
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        };
-                                        Thread mythread = new Thread(runnable);
-                                        mythread.start();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                } else {
-                                    try {
-                                        Runnable runnable = new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Client c = new Client(cxt);
-                                                    c.execute(myusers, mymsg, peer.deviceName);
-                                                }
-                                                catch (Exception e){
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        };
-                                        Thread mythread = new Thread(runnable);
-                                        mythread.start();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+
+//                          if(info.groupFormed) {
+//                            try {
+//                                if (info.isGroupOwner) {
+//                                    try {
+//                                        Runnable runnable = new Runnable() {
+//                                            @Override
+//                                            public void run() {
+//                                                Server s = new Server(cxt);
+//                                                try {
+//                                                    s.execute(myusers, mymsg, peer.deviceName);
+//                                                }
+//                                                catch (Exception e){
+//                                                    e.printStackTrace();
+//                                                }
+//                                            }
+//                                        };
+//                                        Thread mythread = new Thread(runnable);
+//                                        mythread.start();
+//                                    } catch (Exception e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                } else {
+//                                    try {
+//                                        Runnable runnable = new Runnable() {
+//                                            @Override
+//                                            public void run() {
+//                                                try {
+//                                                    Client c = new Client(cxt);
+//                                                    c.execute(myusers, mymsg, peer.deviceName);
+//                                                }
+//                                                catch (Exception e){
+//                                                    e.printStackTrace();
+//                                                }
+//                                            }
+//                                        };
+//                                        Thread mythread = new Thread(runnable);
+//                                        mythread.start();
+//                                    } catch (Exception e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
 //                        }
                     }
                 });

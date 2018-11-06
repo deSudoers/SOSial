@@ -2,7 +2,6 @@ package com.sosial.sudoers.sosial;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -14,66 +13,76 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-class Server extends AsyncTask<String, Void, String>{
+class Server implements Runnable{
     Context cxt;
     SharedPreferences sp, spmessages;
+    static boolean running = false;
+
     Server(Context cxt){
         this.cxt = cxt;
         sp = cxt.getSharedPreferences("login", Context.MODE_PRIVATE);
         spmessages = cxt.getSharedPreferences("allmessages", Context.MODE_PRIVATE);
     }
-    @Override
-    protected String doInBackground(String... params){
-        ServerSocket sock = null;
-        Socket socket = null;
-        String message = "finally";
-        try{
-            sock = new ServerSocket(5678);
-            sock.setSoTimeout(30000);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+
+    public void run(){
         try {
-            socket = sock.accept();
-            InputStream in = socket.getInputStream();
-            ObjectInputStream ois = new ObjectInputStream(in);
-            message = (String) ois.readObject();
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            String send = params[0]+"###"+ params[1];
-            oos.writeObject(send);
-            ois.close();
-            oos.close();
-            socket.close();
-//            spmessages.edit().putString("connected", params[2]).apply();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                sock.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+            while (true) {
+                running = true;
+                try {
+                    ServerSocket sock = new ServerSocket(5678);
+                    Socket socket = sock.accept();
+                    InputStream in = socket.getInputStream();
+                    ObjectInputStream ois = new ObjectInputStream(in);
+                    String message = (String) ois.readObject();
+                    ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+
+                    String msg = "";
+                    for (int i = 0; i < spmessages.getInt("allmymessagescount", 0); ++i) {
+                        msg = msg.concat(spmessages.getString("allmymessages" + i, "") + " ## ");
+                    }
+                    String myusers = spmessages.getString("allmyusers", sp.getInt("myid", 0) + ",");
+
+                    String send = myusers + "###" + msg;
+
+                    oos.writeObject(send);
+                    ois.close();
+                    oos.close();
+                    in.close();
+                    socket.close();
+                    sock.close();
+
+                    String ss[] = message.split("###");
+                    String users = ss[0];
+                    String msgs = ss[1];
+                    addUsers(users);
+                    addMessagetoDatabase(msgs);
+                    Thread.sleep(2000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            return message;
+        }
+        finally {
+            running = false;
         }
     }
 
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-        try {
-            if (!s.equals("finally")) {
-                String ss[] = s.split("###");
-                String users = ss[0];
-                String msgs = ss[1];
-                addUsers(users);
-                addMessagetoDatabase(msgs);
-            }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+//    @Override
+//    protected void onPostExecute(String s) {
+//        super.onPostExecute(s);
+//        try {
+//            if (!s.equals("finally")) {
+//                String ss[] = s.split("###");
+//                String users = ss[0];
+//                String msgs = ss[1];
+//                addUsers(users);
+//                addMessagetoDatabase(msgs);
+//            }
+//        }
+//        catch (Exception e){
+//            e.printStackTrace();
+//        }
+//    }
 
     public void addMessagetoDatabase(String myid, String name, String receiver, String msg, String key){
         int count = spmessages.getInt("allmymessagescount",0);
